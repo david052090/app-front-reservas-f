@@ -1,0 +1,1 @@
+export const GESTIONAR_RESERVAS = import.meta.env.VITE_GESTIONAR_RESERVAS;
