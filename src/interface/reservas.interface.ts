@@ -11,4 +11,11 @@ export interface IDataReservas {
 }
 export interface IListadoReservas {
   dataListadoReservas: IDataReservas[];
+  cargando: boolean;
+  setAbrirModalEditar: React.Dispatch<React.SetStateAction<boolean>>;
+  setReservaEditar: React.Dispatch<React.SetStateAction<IDataReservas | null>>;
+  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
+  selected: number[];
+  setSelectedData: React.Dispatch<React.SetStateAction<IDataReservas[]>>;
+  selectedData: IDataReservas[];
 }

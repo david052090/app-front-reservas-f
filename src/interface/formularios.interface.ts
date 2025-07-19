@@ -1,3 +1,4 @@
+import { IDataReservas } from "./reservas.interface";
 export interface FormInputsRegistrar {
   nombre: string;
   nombre_restaurante: string;
@@ -19,10 +20,22 @@ export interface FormValues {
   hora: string;
   tipo_reserva: string;
   numero_mesa: number;
-  estado_reserva: string;
+  estado_reserva: boolean;
+  ubicacion: string;
+  observacion: string;
 }
 
 export interface IModalRegistroReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
   abrirModalReservas: boolean;
+  actualizarData: () => void;
+}
+
+export interface IModalEditarReserva {
+  abrirModalEditar: boolean;
+  setAbrirModalEditar: React.Dispatch<React.SetStateAction<boolean>>;
+  reservaEditar: FormValues | null;
+  actualizarData: () => void;
+  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
+  setSelectedData: React.Dispatch<React.SetStateAction<IDataReservas[]>>;
 }

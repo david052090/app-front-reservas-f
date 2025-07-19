@@ -1,32 +1,43 @@
 import Modal from "./Modal.moleculas";
-import { Box, TextField, MenuItem } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
-import { dataRegistrarReserva } from "../../api/consultarReservas.ts";
-import { useState } from "react";
 import {
-  FormValues,
-  IModalRegistroReservas,
-} from "../../interface/formularios.interface";
+  Box,
+  TextField,
+  MenuItem,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import "dayjs/locale/es";
-import dayjs from "dayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import { actualizarReserva } from "../../api/consultarReservas";
 import { UBICACIONES } from "../../constants/global.constants";
+import {
+  IModalEditarReserva,
+  FormValues,
+} from "../../interface/formularios.interface";
 
 const tiposReserva = [
   { value: "normal", label: "Normal" },
   { value: "vip", label: "VIP" },
 ];
-const ModalRegistroReservas = ({
-  setAbrirModalReservas,
-  abrirModalReservas,
+
+const ModalEditarReserva = ({
+  abrirModalEditar,
+  setAbrirModalEditar,
+  reservaEditar,
   actualizarData,
-}: IModalRegistroReservas) => {
+  setSelected,
+  setSelectedData,
+}: IModalEditarReserva) => {
   const { enqueueSnackbar } = useSnackbar();
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
+
   const {
     control,
     handleSubmit,
@@ -36,52 +47,72 @@ const ModalRegistroReservas = ({
     defaultValues: {
       nombre_cliente: "",
       celular: "",
-      cantidad_personas: null,
+      cantidad_personas: 0,
       fecha: null,
       hora: null,
       tipo_reserva: "",
-      numero_mesa: null,
+      numero_mesa: 0,
       estado_reserva: true,
       ubicacion: "",
       observacion: "",
     },
   });
+
+  useEffect(() => {
+    if (reservaEditar) {
+      reset({
+        ...reservaEditar,
+        fecha: dayjs(reservaEditar.fecha),
+        hora: dayjs(reservaEditar.hora, "HH:mm"),
+        estado_reserva: reservaEditar.estado_reserva,
+      });
+    }
+  }, [reservaEditar]);
+
   const onSubmit = async (data: FormValues) => {
-    const userId = localStorage.getItem("userId");
     try {
       setCargandoBtn(true);
-      const dataResponse = await dataRegistrarReserva({
+      const userId = localStorage.getItem("userId");
+
+      await actualizarReserva({
         ...data,
-        userId,
+        id: reservaEditar?.id as number, // forzamos que no sea undefined
         fecha: dayjs(data.fecha).format("YYYY-MM-DD"),
         hora: dayjs(data.hora).format("HH:mm"),
+        estado_reserva: data.estado_reserva,
       });
-      console.log("dataResponse", dataResponse);
-      setAbrirModalReservas(false);
-      actualizarData();
-      reset();
-      enqueueSnackbar("Reserva creada con exito.", {
+
+      enqueueSnackbar("Reserva actualizada con éxito.", {
         variant: "success",
       });
+
+      actualizarData();
+      setAbrirModalEditar(false);
+      reset();
+      setSelected([]);
+      setSelectedData([]);
     } catch (error) {
-      console.log("error", error);
-      enqueueSnackbar("Error de conexión, por favor intente más tarde.", {
-        variant: "warning",
+      console.error(error);
+      enqueueSnackbar("Error al actualizar la reserva", {
+        variant: "error",
       });
     } finally {
       setCargandoBtn(false);
     }
   };
+  const cancelar = () => {
+    setAbrirModalEditar(false);
+    reset();
+    setSelected([]);
+    setSelectedData([]);
+  };
   return (
     <Modal
-      open={abrirModalReservas}
-      onCancelar={() => {
-        setAbrirModalReservas(false);
-        reset();
-      }}
+      open={abrirModalEditar}
+      onCancelar={cancelar}
       onGuardar={handleSubmit(onSubmit)}
-      titulo="Registrar reserva"
-      btnGuardar="Aceptar"
+      titulo="Editar reserva"
+      btnGuardar="Guardar"
       width={600}
       mostrarBtnCancelar
       mostrarBtnGuardar
@@ -95,7 +126,7 @@ const ModalRegistroReservas = ({
           pt: 2,
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
-          gap: 2, // espacio uniforme entre filas y columnas
+          gap: 2,
         }}
       >
         {/* 1ª fila */}
@@ -222,6 +253,7 @@ const ModalRegistroReservas = ({
             </TextField>
           )}
         />
+
         <Controller
           name="numero_mesa"
           control={control}
@@ -276,8 +308,25 @@ const ModalRegistroReservas = ({
             />
           )}
         />
+        <Controller
+          name="estado_reserva"
+          control={control}
+          render={({ field }) => (
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={field.value}
+                  onChange={(e) => field.onChange(e.target.checked)}
+                  color="primary"
+                />
+              }
+              label={field.value ? "Confirmada" : "Cancelada"}
+            />
+          )}
+        />
       </Box>
     </Modal>
   );
 };
-export default ModalRegistroReservas;
+
+export default ModalEditarReserva;
