@@ -3,20 +3,70 @@
 import { Box } from "@mui/material";
 import BotonRedondo from "../atomos/BotonRedondo.atomos";
 import AddIcon from "@mui/icons-material/Add";
+import ReplayIcon from "@mui/icons-material/Replay";
+import IconButton from "@mui/material/IconButton";
+import { InputBase } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
+import { useState } from "react";
 interface IEncabezadoReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
+  actualizarTabla: () => void;
+  filtro: string;
+  setFiltro: (valor: string) => void;
 }
 export default function EncabezadoReservas({
   setAbrirModalReservas,
+  actualizarTabla,
+  filtro,
+  setFiltro,
 }: IEncabezadoReservas) {
+  const [valorBuscador, setValorBuscador] = useState<string>(filtro);
+  const handleClear = () => {
+    setValorBuscador("");
+    setFiltro("");
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValorBuscador(e.target.value);
+    setFiltro(e.target.value);
+  };
   return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: "flex-end",
+        justifyContent: "space-between",
         paddingBottom: 1,
       }}
     >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          backgroundColor: "#f0f0f0",
+          borderRadius: "999px",
+          px: 1.5,
+          height: 38,
+          minWidth: 250,
+          marginRight: 2,
+        }}
+      >
+        <SearchIcon sx={{ color: "#888", mr: 1 }} />
+
+        <InputBase
+          placeholder="Buscar por nombre..."
+          value={valorBuscador}
+          onChange={handleChange}
+          sx={{ flex: 1, fontSize: 14 }}
+        />
+
+        {valorBuscador && (
+          <IconButton size="small" onClick={handleClear} sx={{ p: 0.5 }}>
+            <ClearIcon fontSize="small" />
+          </IconButton>
+        )}
+      </Box>
+
       <Box
         sx={{
           display: "flex",
@@ -24,6 +74,12 @@ export default function EncabezadoReservas({
           paddingBottom: 1,
         }}
       >
+        <IconButton
+          onClick={actualizarTabla}
+          sx={{ marginRight: "25px", backgroundColor: "#f0f0f0" }}
+        >
+          <ReplayIcon />
+        </IconButton>
         <BotonRedondo
           texto={"Nueva"}
           icono={<AddIcon />}
