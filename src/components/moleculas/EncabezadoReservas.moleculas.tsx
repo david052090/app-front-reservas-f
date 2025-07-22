@@ -9,17 +9,26 @@ import { InputBase } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
 import { useState } from "react";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+import InputAdornment from "@mui/material/InputAdornment";
 interface IEncabezadoReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
   actualizarTabla: () => void;
   filtro: string;
-  setFiltro: (valor: string) => void;
+  setFiltro: React.Dispatch<React.SetStateAction<string>>;
+  filtroFecha: Dayjs | null;
+  setFiltroFecha: React.Dispatch<React.SetStateAction<Dayjs | null>>;
 }
 export default function EncabezadoReservas({
   setAbrirModalReservas,
   actualizarTabla,
   filtro,
   setFiltro,
+  filtroFecha,
+  setFiltroFecha,
 }: IEncabezadoReservas) {
   const [valorBuscador, setValorBuscador] = useState<string>(filtro);
   const handleClear = () => {
@@ -74,6 +83,39 @@ export default function EncabezadoReservas({
           paddingBottom: 1,
         }}
       >
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+          <DatePicker
+            label="Filtrar por fecha"
+            value={filtroFecha}
+            onChange={(nuevaFecha) => setFiltroFecha(nuevaFecha)}
+            slotProps={{
+              textField: {
+                size: "small",
+                sx: {
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "10px",
+                  width: 180,
+                  marginRight: "25px",
+                },
+                InputProps: filtroFecha
+                  ? {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            size="small"
+                            onClick={() => setFiltroFecha(null)}
+                            sx={{ p: 0.5 }}
+                          >
+                            <ClearIcon fontSize="small" />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }
+                  : {},
+              },
+            }}
+          />
+        </LocalizationProvider>
         <IconButton
           onClick={actualizarTabla}
           sx={{ marginRight: "25px", backgroundColor: "#f0f0f0" }}

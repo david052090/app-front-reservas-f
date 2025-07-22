@@ -25,6 +25,7 @@ import { useState } from "react";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
+import dayjs from "dayjs";
 
 const TablaReservas = ({
   dataListadoReservas,
@@ -36,6 +37,9 @@ const TablaReservas = ({
   setSelectedData,
   selectedData,
 }: IListadoReservas) => {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const allIds = dataListadoReservas.map((r) => r.id);
@@ -67,6 +71,22 @@ const TablaReservas = ({
     setSelected(newSelected);
     setSelectedData(newSelectedData);
   };
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const visibleRows = dataListadoReservas.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   const allSelected =
     dataListadoReservas.length > 0 &&
@@ -131,15 +151,15 @@ const TablaReservas = ({
               </TableRow>
             ) : (
               <>
-                {dataListadoReservas.length === 0 ? (
+                {visibleRows.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} align="center">
+                    <TableCell colSpan={10} align="center">
                       Sin resultado
                     </TableCell>
                   </TableRow>
                 ) : (
                   <>
-                    {dataListadoReservas.map((row) => {
+                    {visibleRows.map((row) => {
                       return (
                         <TableRow hover tabIndex={-1} key={row.id}>
                           <TableCell padding="checkbox">
@@ -195,7 +215,7 @@ const TablaReservas = ({
                             align="right"
                             sx={{ color: "rgba(0, 0, 0, 0.6)" }}
                           >
-                            {row.hora}
+                            {dayjs(row.hora, "HH:mm:ss").format("hh:mm A")}
                           </TableCell>
                           <TableCell
                             align="right"
@@ -260,11 +280,11 @@ const TablaReservas = ({
           sx={{ color: "#0779cc", fontSize: "400" }}
           rowsPerPageOptions={[10, 30, 50, 100, 200]}
           count={dataListadoReservas.length}
-          rowsPerPage={0}
-          page={0}
-          onPageChange={() => {}}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="Reservas por página:"
-          onRowsPerPageChange={() => {}}
           labelDisplayedRows={({ from, to, count }) =>
             `${from}-${to} de ${count}`
           }

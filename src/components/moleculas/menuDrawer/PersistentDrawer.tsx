@@ -21,7 +21,8 @@ import ListItemText from "@mui/material/ListItemText";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import AddHomeOutlinedIcon from "@mui/icons-material/AddHomeOutlined";
+import BentoOutlinedIcon from "@mui/icons-material/BentoOutlined";
 const drawerWidth = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
@@ -169,6 +170,34 @@ export default function PersistentDrawer({
                 <RestaurantIcon />
               </ListItemIcon>
               <ListItemText primary="Reservas" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton
+              component={RouterLink}
+              to="/reservas"
+              //selected={location.pathname === "/reservas"}
+            >
+              <ListItemIcon>
+                <AddHomeOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Ambientes" />
+            </ListItemButton>
+          </ListItem>
+        </List>
+        <List>
+          <ListItem disablePadding>
+            <ListItemButton
+              component={RouterLink}
+              to="/reservas"
+              //selected={location.pathname === "/reservas"}
+            >
+              <ListItemIcon>
+                <BentoOutlinedIcon />
+              </ListItemIcon>
+              <ListItemText primary="Tipo de Reservas" />
             </ListItemButton>
           </ListItem>
         </List>
