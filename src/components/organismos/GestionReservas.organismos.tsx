@@ -5,8 +5,10 @@ import { gestionarListadoReservas } from "../../api/consultarReservas.ts";
 import ModalRegistroReservas from "../moleculas/ModalRegistroReservas.moleculas";
 import { IDataReservas } from "../../interface/reservas.interface";
 import ModalEditarReserva from "../moleculas/ModalEditarReservas.moleculas";
+import dayjs, { Dayjs } from "dayjs";
 const GestionReservas = () => {
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
+  const [dataFiltrada, setDataFiltrada] = useState<IDataReservas[]>([]);
   const [abrirModalReservas, setAbrirModalReservas] = useState<boolean>(false);
   const [cargando, setCargando] = useState<boolean>(false);
   const [abrirModalEditar, setAbrirModalEditar] = useState<boolean>(false);
@@ -15,7 +17,9 @@ const GestionReservas = () => {
   );
   const [selected, setSelected] = useState<number[]>([]);
   const [selectedData, setSelectedData] = useState<IDataReservas[]>([]);
-  const [busqueda, setBusqueda] = useState("");
+  const [filtro, setFiltro] = useState("");
+  const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(null);
+
   useEffect(() => {
     getListarReservas();
   }, []);
@@ -25,26 +29,41 @@ const GestionReservas = () => {
       const userId = localStorage.getItem("userId");
       const dataListado = await gestionarListadoReservas(userId);
       setListarReservas(dataListado.reservas);
-      console.log("dataListado", dataListado);
     } catch (error) {
       console.log("error", error);
     } finally {
       setCargando(false);
     }
   };
-  const reservasFiltradas = listarReservas.filter((r) =>
-    r.nombre_cliente.toLowerCase().includes(busqueda.toLowerCase())
-  );
+
+  useEffect(() => {
+    const filtrado = listarReservas.filter((reserva) => {
+      const coincideNombre = reserva.nombre_cliente
+        .toLowerCase()
+        .includes(filtro.toLowerCase());
+
+      const coincideFecha = filtroFecha
+        ? dayjs(reserva.fecha).isSame(filtroFecha, "day")
+        : true;
+
+      return coincideNombre && coincideFecha;
+    });
+
+    setDataFiltrada(filtrado);
+  }, [filtro, filtroFecha, listarReservas]);
+
   return (
     <>
       <EncabezadoReservas
         setAbrirModalReservas={setAbrirModalReservas}
         actualizarTabla={() => getListarReservas()}
-        filtro={busqueda}
-        setFiltro={setBusqueda}
+        filtro={filtro}
+        setFiltro={setFiltro}
+        filtroFecha={filtroFecha}
+        setFiltroFecha={setFiltroFecha}
       />
       <TablaReservas
-        dataListadoReservas={reservasFiltradas}
+        dataListadoReservas={dataFiltrada}
         cargando={cargando}
         setAbrirModalEditar={setAbrirModalEditar}
         setReservaEditar={setReservaEditar}

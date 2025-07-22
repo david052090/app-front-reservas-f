@@ -164,14 +164,14 @@ const ModalRegistroReservas = ({
                 value={field.value}
                 onChange={(date) => field.onChange(date)}
                 minDate={dayjs()}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    error={!!errors.fecha}
-                    helperText={errors.fecha?.message}
-                  />
-                )}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!errors.fecha,
+                    helperText: errors.fecha?.message,
+                  },
+                }}
+                renderInput={(params) => <TextField {...params} fullWidth />}
               />
             )}
           />
@@ -188,14 +188,14 @@ const ModalRegistroReservas = ({
                 label="Hora"
                 value={field.value}
                 onChange={(time) => field.onChange(time)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    error={!!errors.hora}
-                    helperText={errors.hora?.message}
-                  />
-                )}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!errors.hora,
+                    helperText: errors.hora?.message,
+                  },
+                }}
+                renderInput={(params) => <TextField {...params} fullWidth />}
               />
             )}
           />
