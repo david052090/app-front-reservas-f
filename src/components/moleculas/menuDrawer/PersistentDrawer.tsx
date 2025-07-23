@@ -177,8 +177,8 @@ export default function PersistentDrawer({
           <ListItem disablePadding>
             <ListItemButton
               component={RouterLink}
-              to="/reservas"
-              //selected={location.pathname === "/reservas"}
+              to="/ambientes"
+              selected={location.pathname === "/ambientes"}
             >
               <ListItemIcon>
                 <AddHomeOutlinedIcon />
@@ -191,8 +191,8 @@ export default function PersistentDrawer({
           <ListItem disablePadding>
             <ListItemButton
               component={RouterLink}
-              to="/reservas"
-              //selected={location.pathname === "/reservas"}
+              to="/tipos-reservas"
+              selected={location.pathname === "/tipos-reservas"}
             >
               <ListItemIcon>
                 <BentoOutlinedIcon />

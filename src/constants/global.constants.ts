@@ -62,6 +62,30 @@ export const ENCABEZADO_TABLA_RESERVAS: Array<ITablaEncabezado> = [
     width: "10%",
   },
 ];
+export const ENCABEZADO_TABLA_GESTIONAR_AMBIENTES: Array<ITablaEncabezado> = [
+  {
+    id: "id_ambiente",
+    label: "Id",
+    align: "left",
+    width: "25%",
+    paddingLeft: "25px",
+    iconoOrdenar: true,
+  },
+  {
+    id: "nombre",
+    label: "Nombre",
+    align: "right",
+    width: "35%",
+    iconoOrdenar: true,
+  },
+  {
+    id: "fecha_registro",
+    label: "Fecha registro",
+    align: "right",
+    width: "35%",
+    iconoOrdenar: true,
+  },
+];
 export const UBICACIONES = [
   { value: "primer piso", label: "Primer piso" },
   { value: "segundo piso", label: "Segundo piso" },

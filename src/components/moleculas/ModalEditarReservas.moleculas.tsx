@@ -17,6 +17,8 @@ import dayjs from "dayjs";
 import "dayjs/locale/es";
 import { actualizarReserva } from "../../api/consultarReservas";
 import { UBICACIONES } from "../../constants/global.constants";
+import { getListaAmbientes } from "../../utils/obtenerAmbientes";
+import { ITiposAmbientes } from "../../interface/formularios.interface";
 import {
   IModalEditarReserva,
   FormValues,
@@ -37,7 +39,9 @@ const ModalEditarReserva = ({
 }: IModalEditarReserva) => {
   const { enqueueSnackbar } = useSnackbar();
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
-
+  const [listarTipoAmbientes, setListarTipoAmbientes] = useState<
+    ITiposAmbientes[]
+  >([]);
   const {
     control,
     handleSubmit,
@@ -52,7 +56,7 @@ const ModalEditarReserva = ({
       hora: null,
       tipo_reserva: "",
       numero_mesa: 0,
-      estado_reserva: true,
+      estado_reserva: true ? 1 : 0,
       ubicacion: "",
       observacion: "",
     },
@@ -66,6 +70,7 @@ const ModalEditarReserva = ({
         hora: dayjs(reservaEditar.hora, "HH:mm"),
         estado_reserva: reservaEditar.estado_reserva,
       });
+      listarAmbientes();
     }
   }, [reservaEditar]);
 
@@ -98,6 +103,16 @@ const ModalEditarReserva = ({
       });
     } finally {
       setCargandoBtn(false);
+    }
+  };
+
+  const listarAmbientes = async () => {
+    try {
+      const respuesta = await getListaAmbientes();
+      setListarTipoAmbientes(respuesta);
+      console.log("respuesta", respuesta);
+    } catch (error) {
+      console.log(error);
     }
   };
   const cancelar = () => {
@@ -245,9 +260,9 @@ const ModalEditarReserva = ({
               error={!!errors.tipo_reserva}
               helperText={errors.tipo_reserva?.message}
             >
-              {tiposReserva.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>
-                  {opt.label}
+              {listarTipoAmbientes.map((opt) => (
+                <MenuItem key={opt.nombre_ambiente} value={opt.nombre_ambiente}>
+                  {opt.nombre_ambiente}
                 </MenuItem>
               ))}
             </TextField>

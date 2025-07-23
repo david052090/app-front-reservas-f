@@ -12,6 +12,11 @@ export interface LoginInputs {
   password: string;
 }
 
+export interface ITiposAmbientes {
+  id: number;
+  nombre_ambiente: string;
+}
+
 export interface FormValues {
   nombre_cliente: string;
   celular: string;
@@ -28,6 +33,12 @@ export interface FormValues {
 export interface IModalRegistroReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
   abrirModalReservas: boolean;
+  actualizarData: () => void;
+}
+
+export interface IModalRegistroAmbiente {
+  setAbrirModalAmbiente: React.Dispatch<React.SetStateAction<boolean>>;
+  abrirModalAmbiente: boolean;
   actualizarData: () => void;
 }
 

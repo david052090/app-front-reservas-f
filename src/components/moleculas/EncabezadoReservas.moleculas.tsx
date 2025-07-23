@@ -17,10 +17,12 @@ import InputAdornment from "@mui/material/InputAdornment";
 interface IEncabezadoReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
   actualizarTabla: () => void;
-  filtro: string;
-  setFiltro: React.Dispatch<React.SetStateAction<string>>;
-  filtroFecha: Dayjs | null;
-  setFiltroFecha: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+  filtro?: string;
+  setFiltro?: React.Dispatch<React.SetStateAction<string>>;
+  filtroFecha?: Dayjs | null;
+  setFiltroFecha?: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+  mostrarBuscador?: boolean;
+  mostrarFecha: boolean;
 }
 export default function EncabezadoReservas({
   setAbrirModalReservas,
@@ -29,6 +31,8 @@ export default function EncabezadoReservas({
   setFiltro,
   filtroFecha,
   setFiltroFecha,
+  mostrarBuscador,
+  mostrarFecha,
 }: IEncabezadoReservas) {
   const [valorBuscador, setValorBuscador] = useState<string>(filtro);
   const handleClear = () => {
@@ -44,37 +48,40 @@ export default function EncabezadoReservas({
     <Box
       sx={{
         display: "flex",
-        justifyContent: "space-between",
+        justifyContent:
+          !mostrarBuscador && !mostrarFecha ? "flex-end" : "space-between",
         paddingBottom: 1,
       }}
     >
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          backgroundColor: "#f0f0f0",
-          borderRadius: "999px",
-          px: 1.5,
-          height: 38,
-          minWidth: 250,
-          marginRight: 2,
-        }}
-      >
-        <SearchIcon sx={{ color: "#888", mr: 1 }} />
+      {mostrarBuscador && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            backgroundColor: "#f0f0f0",
+            borderRadius: "999px",
+            px: 1.5,
+            height: 38,
+            minWidth: 250,
+            marginRight: 2,
+          }}
+        >
+          <SearchIcon sx={{ color: "#888", mr: 1 }} />
 
-        <InputBase
-          placeholder="Buscar por nombre..."
-          value={valorBuscador}
-          onChange={handleChange}
-          sx={{ flex: 1, fontSize: 14 }}
-        />
+          <InputBase
+            placeholder="Buscar por nombre..."
+            value={valorBuscador}
+            onChange={handleChange}
+            sx={{ flex: 1, fontSize: 14 }}
+          />
 
-        {valorBuscador && (
-          <IconButton size="small" onClick={handleClear} sx={{ p: 0.5 }}>
-            <ClearIcon fontSize="small" />
-          </IconButton>
-        )}
-      </Box>
+          {valorBuscador && (
+            <IconButton size="small" onClick={handleClear} sx={{ p: 0.5 }}>
+              <ClearIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
+      )}
 
       <Box
         sx={{
@@ -83,39 +90,42 @@ export default function EncabezadoReservas({
           paddingBottom: 1,
         }}
       >
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-          <DatePicker
-            label="Filtrar por fecha"
-            value={filtroFecha}
-            onChange={(nuevaFecha) => setFiltroFecha(nuevaFecha)}
-            slotProps={{
-              textField: {
-                size: "small",
-                sx: {
-                  backgroundColor: "#f0f0f0",
-                  borderRadius: "10px",
-                  width: 180,
-                  marginRight: "25px",
+        {mostrarFecha && (
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+            <DatePicker
+              label="Filtrar por fecha"
+              value={filtroFecha}
+              onChange={(nuevaFecha) => setFiltroFecha(nuevaFecha)}
+              slotProps={{
+                textField: {
+                  size: "small",
+                  sx: {
+                    backgroundColor: "#f0f0f0",
+                    borderRadius: "10px",
+                    width: 180,
+                    marginRight: "25px",
+                  },
+                  InputProps: filtroFecha
+                    ? {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              size="small"
+                              onClick={() => setFiltroFecha(null)}
+                              sx={{ p: 0.5 }}
+                            >
+                              <ClearIcon fontSize="small" />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }
+                    : {},
                 },
-                InputProps: filtroFecha
-                  ? {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            size="small"
-                            onClick={() => setFiltroFecha(null)}
-                            sx={{ p: 0.5 }}
-                          >
-                            <ClearIcon fontSize="small" />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }
-                  : {},
-              },
-            }}
-          />
-        </LocalizationProvider>
+              }}
+            />
+          </LocalizationProvider>
+        )}
+
         <IconButton
           onClick={actualizarTabla}
           sx={{ marginRight: "25px", backgroundColor: "#f0f0f0" }}
