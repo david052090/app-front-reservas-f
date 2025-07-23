@@ -6,6 +6,8 @@ import ModalRegistroReservas from "../moleculas/ModalRegistroReservas.moleculas"
 import { IDataReservas } from "../../interface/reservas.interface";
 import ModalEditarReserva from "../moleculas/ModalEditarReservas.moleculas";
 import dayjs, { Dayjs } from "dayjs";
+import { getListaAmbientes } from "../../utils/obtenerAmbientes";
+
 const GestionReservas = () => {
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
   const [dataFiltrada, setDataFiltrada] = useState<IDataReservas[]>([]);
@@ -26,8 +28,8 @@ const GestionReservas = () => {
   const getListarReservas = async () => {
     try {
       setCargando(true);
-      const userId = localStorage.getItem("userId");
-      const dataListado = await gestionarListadoReservas(userId);
+      //const userId = localStorage.getItem("userId");
+      const dataListado = await gestionarListadoReservas();
       setListarReservas(dataListado.reservas);
     } catch (error) {
       console.log("error", error);
@@ -61,6 +63,8 @@ const GestionReservas = () => {
         setFiltro={setFiltro}
         filtroFecha={filtroFecha}
         setFiltroFecha={setFiltroFecha}
+        mostrarBuscador
+        mostrarFecha
       />
       <TablaReservas
         dataListadoReservas={dataFiltrada}
