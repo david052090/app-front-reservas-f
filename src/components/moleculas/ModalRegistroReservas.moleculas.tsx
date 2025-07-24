@@ -17,7 +17,7 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { UBICACIONES } from "../../constants/global.constants";
 import { getListaAmbientes } from "../../utils/obtenerAmbientes";
 import { ITiposAmbientes } from "../../interface/formularios.interface";
-
+import { obtenerTiposReserva } from "../../api/consultarTipoReservas.ts";
 const ModalRegistroReservas = ({
   setAbrirModalReservas,
   abrirModalReservas,
@@ -27,6 +27,9 @@ const ModalRegistroReservas = ({
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
   const [listarTipoAmbientes, setListarTipoAmbientes] = useState<
     ITiposAmbientes[]
+  >([]);
+  const [listarTipoReservas, setListarTipoReservas] = useState<
+    ITiposReservas[]
   >([]);
   const {
     control,
@@ -51,6 +54,7 @@ const ModalRegistroReservas = ({
   useEffect(() => {
     if (abrirModalReservas) {
       listarAmbientes();
+      listarDataTipoReservas();
     }
   }, [abrirModalReservas]);
 
@@ -84,6 +88,16 @@ const ModalRegistroReservas = ({
     try {
       const respuesta = await getListaAmbientes();
       setListarTipoAmbientes(respuesta);
+      console.log("respuesta", respuesta);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const listarDataTipoReservas = async () => {
+    try {
+      const respuesta = await obtenerTiposReserva();
+      setListarTipoReservas(respuesta);
       console.log("respuesta", respuesta);
     } catch (error) {
       console.log(error);
@@ -231,9 +245,12 @@ const ModalRegistroReservas = ({
               error={!!errors.tipo_reserva}
               helperText={errors.tipo_reserva?.message}
             >
-              {listarTipoAmbientes.map((opt) => (
-                <MenuItem key={opt.nombre_ambiente} value={opt.nombre_ambiente}>
-                  {opt.nombre_ambiente}
+              {listarTipoReservas.map((opt) => (
+                <MenuItem
+                  key={opt.nombre_tipo_reserva}
+                  value={opt.nombre_tipo_reserva}
+                >
+                  {opt.nombre_tipo_reserva}
                 </MenuItem>
               ))}
             </TextField>
@@ -271,9 +288,9 @@ const ModalRegistroReservas = ({
               error={!!errors.ubicacion}
               helperText={errors.ubicacion?.message}
             >
-              {UBICACIONES.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>
-                  {opt.label}
+              {listarTipoAmbientes.map((opt) => (
+                <MenuItem key={opt.nombre_ambiente} value={opt.nombre_ambiente}>
+                  {opt.nombre_ambiente}
                 </MenuItem>
               ))}
             </TextField>
