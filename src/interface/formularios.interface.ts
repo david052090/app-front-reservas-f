@@ -12,11 +12,15 @@ export interface LoginInputs {
   password: string;
 }
 
-export interface ITiposAmbientes {
+export interface ITiposAmbientesReservas {
   id: number;
   nombre_ambiente: string;
 }
 
+export interface ITiposReservas {
+  id: number;
+  nombre_tipo_reserva: string;
+}
 export interface FormValues {
   nombre_cliente: string;
   celular: string;
@@ -41,7 +45,11 @@ export interface IModalRegistroAmbiente {
   abrirModalAmbiente: boolean;
   actualizarData: () => void;
 }
-
+export interface IModalRegistroTipoReservas {
+  setAbrirModalTipoReservas: React.Dispatch<React.SetStateAction<boolean>>;
+  abrirModalTipoReservas: boolean;
+  actualizarData: () => void;
+}
 export interface IModalEditarReserva {
   abrirModalEditar: boolean;
   setAbrirModalEditar: React.Dispatch<React.SetStateAction<boolean>>;

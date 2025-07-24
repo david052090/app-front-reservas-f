@@ -1,5 +1,5 @@
 import TablaEncabezado from "./TablaEncabezado.moleculas";
-import { ENCABEZADO_TABLA_GESTIONAR_AMBIENTES } from "../../constants/global.constants";
+import { ENCABEZADO_TABLA_GESTIONAR_TIPOS_RESERVAS } from "../../constants/global.constants";
 import {
   IListadoReservas,
   IDataReservas,
@@ -13,6 +13,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
   CircularProgress,
@@ -25,25 +26,26 @@ import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import dayjs from "dayjs";
-import { IListadoGestionAmbientes } from "../../interface/ambientes.interface";
+import { IListadoGestionTiposReservas } from "../../interface/tiposReservas.interface";
 
-const TablaGestionarRegistroAmbientes = ({
-  dataListadoAmbientes,
+const TablaGestionarTiposReservas = ({
+  dataListadoTiposReservas,
   cargando,
-}: IListadoGestionAmbientes) => {
+  setAbrirModalTiposReservas,
+}: IListadoGestionTiposReservas) => {
   return (
     <Paper sx={{ width: "700px", my: 3, overflow: "hidden" }}>
       <TableContainer
         sx={{
-          maxHeight: dataListadoAmbientes.length > 7 ? "550px" : "auto",
-          overflowY: dataListadoAmbientes.length > 7 ? "auto" : "visible",
+          maxHeight: dataListadoTiposReservas.length > 7 ? "550px" : "auto",
+          overflowY: dataListadoTiposReservas.length > 7 ? "auto" : "visible",
         }}
       >
         <Table aria-labelledby="tableTitle collapsible table" stickyHeader>
           <TableHead>
             <TableRow>
               <TablaEncabezado
-                encabezado={ENCABEZADO_TABLA_GESTIONAR_AMBIENTES}
+                encabezado={ENCABEZADO_TABLA_GESTIONAR_TIPOS_RESERVAS}
               />
             </TableRow>
           </TableHead>
@@ -57,7 +59,7 @@ const TablaGestionarRegistroAmbientes = ({
               </TableRow>
             ) : (
               <>
-                {dataListadoAmbientes.length === 0 ? (
+                {dataListadoTiposReservas.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={10} align="center">
                       Sin resultado
@@ -65,14 +67,14 @@ const TablaGestionarRegistroAmbientes = ({
                   </TableRow>
                 ) : (
                   <>
-                    {dataListadoAmbientes.map((row) => {
+                    {dataListadoTiposReservas.map((row) => {
                       return (
                         <TableRow hover tabIndex={-1} key={row.id}>
                           <TableCell
                             align="left"
                             sx={{ color: "rgba(0, 0, 0, 0.6)" }}
                           >
-                            {row.nombre_ambiente}
+                            {row.nombre_tipo_reserva}
                           </TableCell>
                           <TableCell
                             align="right"
@@ -93,4 +95,4 @@ const TablaGestionarRegistroAmbientes = ({
     </Paper>
   );
 };
-export default TablaGestionarRegistroAmbientes;
+export default TablaGestionarTiposReservas;

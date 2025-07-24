@@ -9,17 +9,21 @@ const GestionarRegistroAmbientes = () => {
   const [listarDataAmbientes, setListarDataAmbientes] = useState<
     IListaAmbientes[]
   >([]);
+  const [cargando, setCargando] = useState<boolean>(false);
   useEffect(() => {
     listarAmbientes();
   }, []);
 
   const listarAmbientes = async () => {
     try {
+      setCargando(true);
       const respuesta = await getListaAmbientes();
       setListarDataAmbientes(respuesta);
       console.log("respuesta", respuesta);
     } catch (error) {
       console.log(error);
+    } finally {
+      setCargando(false);
     }
   };
   return (
@@ -30,8 +34,7 @@ const GestionarRegistroAmbientes = () => {
       />
       <TablaGestionarRegistroAmbientes
         dataListadoAmbientes={listarDataAmbientes}
-        setSelected={[]}
-        selected={[]}
+        cargando={cargando}
       />
       <ModalRegistrarAmbiente
         setAbrirModalAmbiente={setAbrirModalAmbiente}

@@ -150,7 +150,8 @@ export default function PersistentDrawer({
         open={open}
       >
         <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
+          <Typography>Dashboard</Typography>
+          <IconButton onClick={handleDrawerClose} sx={{ marginLeft: "40px" }}>
             {theme.direction === "ltr" ? (
               <ChevronLeftIcon />
             ) : (

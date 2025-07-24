@@ -1,7 +1,7 @@
 import Modal from "./Modal.moleculas";
 import { Box, TextField, MenuItem } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import { registrarAmbiente } from "../../api/consultarAmbientes.ts";
+import { registrarTipoReserva } from "../../api/consultarTipoReservas.ts";
 import { useState } from "react";
 import {
   FormValues,
@@ -15,20 +15,16 @@ import "dayjs/locale/es";
 import dayjs from "dayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { UBICACIONES } from "../../constants/global.constants";
-import { IModalRegistroAmbiente } from "../../interface/formularios.interface";
+import { IModalRegistroTipoReservas } from "../../interface/formularios.interface";
 
-const tiposReserva = [
-  { value: "normal", label: "Normal" },
-  { value: "vip", label: "VIP" },
-];
-interface IFormAmbiente {
-  nombre_ambiente: string;
+interface IFormTipoReservas {
+  nombre_tipo_reserva: string;
 }
-const ModalRegistrarAmbiente = ({
-  setAbrirModalAmbiente,
-  abrirModalAmbiente,
+const ModalRegistrarTipoReservas = ({
+  setAbrirModalTipoReservas,
+  abrirModalTipoReservas,
   actualizarData,
-}: IModalRegistroAmbiente) => {
+}: IModalRegistroTipoReservas) => {
   const { enqueueSnackbar } = useSnackbar();
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
   const {
@@ -36,21 +32,23 @@ const ModalRegistrarAmbiente = ({
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<IFormAmbiente>({
+  } = useForm<IFormTipoReservas>({
     defaultValues: {
-      nombre_ambiente: "",
+      nombre_tipo_reserva: "",
     },
   });
-  const onSubmit = async (data: IFormAmbiente) => {
+  const onSubmit = async (data: IFormTipoReservas) => {
     const userId = localStorage.getItem("userId");
     try {
       setCargandoBtn(true);
-      const respuesta = await registrarAmbiente(`${data.nombre_ambiente}`);
+      const respuesta = await registrarTipoReserva(
+        `${data.nombre_tipo_reserva}`
+      );
       console.log("respuesta", respuesta);
-      enqueueSnackbar("Ambiente creado con exito.", {
+      enqueueSnackbar("Tipo reserva creada con exito.", {
         variant: "success",
       });
-      setAbrirModalAmbiente(false);
+      setAbrirModalTipoReservas(false);
       actualizarData();
       reset();
     } catch (err) {
@@ -64,13 +62,13 @@ const ModalRegistrarAmbiente = ({
   };
   return (
     <Modal
-      open={abrirModalAmbiente}
+      open={abrirModalTipoReservas}
       onCancelar={() => {
-        setAbrirModalAmbiente(false);
+        setAbrirModalTipoReservas(false);
         reset();
       }}
       onGuardar={handleSubmit(onSubmit)}
-      titulo="Registrar ambiente"
+      titulo="Registrar tipo de reserva"
       btnGuardar="Aceptar"
       width={600}
       mostrarBtnCancelar
@@ -86,16 +84,16 @@ const ModalRegistrarAmbiente = ({
       >
         {/* 1ª fila */}
         <Controller
-          name="nombre_ambiente"
+          name="nombre_tipo_reserva"
           control={control}
           rules={{ required: "Nombre es obligatorio" }}
           render={({ field }) => (
             <TextField
               {...field}
-              label="Nombre"
+              label="Nombre tipo"
               fullWidth
-              error={!!errors.nombre_ambiente}
-              helperText={errors.nombre_ambiente?.message}
+              error={!!errors.nombre_tipo_reserva}
+              helperText={errors.nombre_tipo_reserva?.message}
             />
           )}
         />
@@ -103,4 +101,4 @@ const ModalRegistrarAmbiente = ({
     </Modal>
   );
 };
-export default ModalRegistrarAmbiente;
+export default ModalRegistrarTipoReservas;
