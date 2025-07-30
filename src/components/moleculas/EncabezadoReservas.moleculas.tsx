@@ -12,8 +12,10 @@ import { useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import InputAdornment from "@mui/material/InputAdornment";
+import Tooltip from "@mui/material/Tooltip";
+
 interface IEncabezadoReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
   actualizarTabla: () => void;
@@ -23,6 +25,9 @@ interface IEncabezadoReservas {
   setFiltroFecha?: React.Dispatch<React.SetStateAction<Dayjs | null>>;
   mostrarBuscador?: boolean;
   mostrarFecha: boolean;
+  reservasHoy?: number;
+  reservasFuturas?: number;
+  mostrarContadores: boolean;
 }
 export default function EncabezadoReservas({
   setAbrirModalReservas,
@@ -33,16 +38,20 @@ export default function EncabezadoReservas({
   setFiltroFecha,
   mostrarBuscador,
   mostrarFecha,
+  reservasHoy,
+  reservasFuturas,
+  mostrarContadores,
 }: IEncabezadoReservas) {
-  const [valorBuscador, setValorBuscador] = useState<string>(filtro);
+  const [valorBuscador, setValorBuscador] = useState<string>(filtro ?? "");
+
   const handleClear = () => {
     setValorBuscador("");
-    setFiltro("");
+    setFiltro?.("");
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValorBuscador(e.target.value);
-    setFiltro(e.target.value);
+    setFiltro?.(e.target.value);
   };
   return (
     <Box
@@ -82,6 +91,49 @@ export default function EncabezadoReservas({
           )}
         </Box>
       )}
+      {mostrarContadores && (
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mr: 2 }}>
+          <Tooltip title="Reservas confirmadas para hoy" arrow>
+            <Box
+              sx={{
+                backgroundColor: "#4caf50",
+                color: "white",
+                borderRadius: "50%",
+                width: 35,
+                height: 35,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                fontSize: 16,
+                cursor: "default",
+              }}
+            >
+              {reservasHoy}
+            </Box>
+          </Tooltip>
+
+          <Tooltip title="Reservas próximas confirmadas" arrow>
+            <Box
+              sx={{
+                backgroundColor: "#ff9800",
+                color: "white",
+                borderRadius: "50%",
+                width: 35,
+                height: 35,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                fontSize: 16,
+                cursor: "default",
+              }}
+            >
+              {reservasFuturas}
+            </Box>
+          </Tooltip>
+        </Box>
+      )}
 
       <Box
         sx={{
@@ -95,7 +147,7 @@ export default function EncabezadoReservas({
             <DatePicker
               label="Filtrar por fecha"
               value={filtroFecha}
-              onChange={(nuevaFecha) => setFiltroFecha(nuevaFecha)}
+              onChange={(nuevaFecha) => setFiltroFecha?.(nuevaFecha)}
               slotProps={{
                 textField: {
                   size: "small",
@@ -111,7 +163,7 @@ export default function EncabezadoReservas({
                           <InputAdornment position="end">
                             <IconButton
                               size="small"
-                              onClick={() => setFiltroFecha(null)}
+                              onClick={() => setFiltroFecha?.(null)}
                               sx={{ p: 0.5 }}
                             >
                               <ClearIcon fontSize="small" />

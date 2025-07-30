@@ -66,7 +66,7 @@ const ModalRegistroReservas = ({
         ...data,
         userId,
         fecha: dayjs(data.fecha).format("YYYY-MM-DD"),
-        hora: dayjs(data.hora).format("HH:mm"),
+        hora: dayjs(data.hora).format("hh:mm A"),
       });
       console.log("dataResponse", dataResponse);
       setAbrirModalReservas(false);

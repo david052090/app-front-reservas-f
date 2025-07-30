@@ -32,3 +32,20 @@ export interface IBotonRedondo {
   isDownloading?: boolean;
   width?: string;
 }
+export interface EstadisticaMensual {
+  mes: number;
+  anio: number;
+  confirmadas: number;
+  canceladas: number;
+}
+export interface IRegistroUsuario {
+  nombre: string;
+  nombre_restaurante: string;
+  nit: string;
+  email: string;
+  password: string;
+}
+export interface ILoginUsuario {
+  nombre: string;
+  password: string;
+}

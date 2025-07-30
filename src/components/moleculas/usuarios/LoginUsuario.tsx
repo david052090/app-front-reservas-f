@@ -6,6 +6,7 @@ import { Link as RouterLink } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { LoginInputs } from "../../../interface/formularios.interface";
+import { loginUsuario } from "../../../api/autenticacionUsuarios.ts";
 export const LoginUsuario = () => {
   const navigate = useNavigate();
   const {
@@ -18,13 +19,8 @@ export const LoginUsuario = () => {
   const onSubmit = async (data: LoginInputs) => {
     try {
       setServerError(null);
-      const response = await axios.post(
-        "http://localhost:3000/api/login",
-        data
-      );
-      if (response.status === 200) {
-        const { token } = response.data;
-        localStorage.setItem("authToken", token);
+      const response = await loginUsuario(data);
+      if (response.token) {
         navigate("/reservas");
       } else {
         setServerError("Credenciales inválidas");
@@ -39,8 +35,8 @@ export const LoginUsuario = () => {
       elevation={3}
       sx={{ p: 4, maxWidth: 400, width: "400px", mx: "auto", mt: 8 }}
     >
-      <Typography variant="h5" gutterBottom>
-        Login de Restaurante
+      <Typography variant="h5" gutterBottom sx={{ marginBottom: "20px" }}>
+        Iniciar Sesión
       </Typography>
       <Box
         component="form"
@@ -50,12 +46,12 @@ export const LoginUsuario = () => {
         gap={2}
       >
         <TextField
-          label="Nombre del restaurante"
-          {...register("nombre_restaurante", {
+          label="Nombre usuario"
+          {...register("nombre", {
             required: "Nombre es obligatorio",
           })}
-          error={!!errors.nombre_restaurante}
-          helperText={errors.nombre_restaurante?.message}
+          error={!!errors.nombre}
+          helperText={errors.nombre?.message}
           fullWidth
         />
         <TextField
@@ -71,14 +67,14 @@ export const LoginUsuario = () => {
           {isSubmitting ? "Validando..." : "Entrar"}
         </Button>
       </Box>
-      <Box textAlign="center" mt={2}>
+      {/** <Box textAlign="center" mt={2}>
         <Typography variant="body2">
           ¿No tienes una cuenta?{" "}
           <Link component={RouterLink} to="/register">
             Registrar
           </Link>
         </Typography>
-      </Box>
+      </Box> */}
     </Paper>
   );
 };
