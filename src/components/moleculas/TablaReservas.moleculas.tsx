@@ -93,10 +93,10 @@ const TablaReservas = ({
     selected.length === dataListadoReservas.length;
   const isIndeterminate = selected.length > 0 && !allSelected;
   return (
-    <Paper sx={{ width: "1050px", my: 3, overflow: "hidden" }}>
+    <Paper sx={{ minWidth: "1000px", my: 3, overflow: "hidden" }}>
       <TableContainer
         sx={{
-          maxHeight: dataListadoReservas.length > 7 ? "550px" : "auto",
+          maxHeight: "500px",
           overflowY: dataListadoReservas.length > 7 ? "auto" : "visible",
         }}
       >
@@ -115,7 +115,7 @@ const TablaReservas = ({
                       }}
                     />
                   )}
-                  {selected.length > 0 && (
+                  {/**{selected.length > 0 && (
                     <DeleteIcon
                       sx={{ cursor: "pointer", color: "#1976d2" }}
                       onClick={() => {
@@ -123,7 +123,7 @@ const TablaReservas = ({
                         console.log("Editar múltiples:", selectedData);
                       }}
                     />
-                  )}
+                  )} */}
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -215,7 +215,7 @@ const TablaReservas = ({
                             align="right"
                             sx={{ color: "rgba(0, 0, 0, 0.6)" }}
                           >
-                            {dayjs(row.hora, "HH:mm:ss").format("hh:mm A")}
+                            {row.hora}
                           </TableCell>
                           <TableCell
                             align="right"

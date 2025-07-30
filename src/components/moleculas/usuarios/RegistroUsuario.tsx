@@ -5,7 +5,7 @@ import { Box, Button, TextField, Typography, Paper, Link } from "@mui/material";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import axios from "axios";
 import { FormInputsRegistrar } from "../../../interface/formularios.interface";
-
+import { registrarUsuario } from "../../../api/autenticacionUsuarios.ts";
 const RegistroUsuario = () => {
   const navigate = useNavigate();
   const {
@@ -19,10 +19,7 @@ const RegistroUsuario = () => {
     console.log("data", data);
     try {
       setServerError(null);
-      const response = await axios.post(
-        "http://localhost:3000/api/register",
-        data
-      );
+      const response = await registrarUsuario(data);
       if (response.status === 201) {
         setServerError("Error en el registro");
         navigate("/login");

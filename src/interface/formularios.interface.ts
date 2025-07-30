@@ -8,7 +8,7 @@ export interface FormInputsRegistrar {
 }
 
 export interface LoginInputs {
-  nombre_restaurante: string;
+  nombre: string;
   password: string;
 }
 

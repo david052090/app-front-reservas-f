@@ -21,7 +21,8 @@ const GestionReservas = () => {
   const [selectedData, setSelectedData] = useState<IDataReservas[]>([]);
   const [filtro, setFiltro] = useState("");
   const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(null);
-
+  const [reservasHoy, setReservasHoy] = useState<number>(0);
+  const [reservasFuturas, setReservasFuturas] = useState<number>(0);
   useEffect(() => {
     getListarReservas();
   }, []);
@@ -52,8 +53,25 @@ const GestionReservas = () => {
     });
 
     setDataFiltrada(filtrado);
+    calcularCantidadReservas();
   }, [filtro, filtroFecha, listarReservas]);
 
+  const calcularCantidadReservas = () => {
+    const hoy = dayjs();
+    const confirmadas = listarReservas.filter(
+      (r) => r.estado_reserva === 1 || r.estado_reserva === true
+    );
+
+    const hoyConfirmadas = confirmadas.filter((r) =>
+      dayjs(r.fecha).isSame(hoy, "day")
+    );
+    const futurasConfirmadas = confirmadas.filter((r) =>
+      dayjs(r.fecha).isAfter(hoy, "day")
+    );
+
+    setReservasHoy(hoyConfirmadas.length);
+    setReservasFuturas(futurasConfirmadas.length);
+  };
   return (
     <>
       <EncabezadoReservas
@@ -65,6 +83,9 @@ const GestionReservas = () => {
         setFiltroFecha={setFiltroFecha}
         mostrarBuscador
         mostrarFecha
+        reservasHoy={reservasHoy}
+        reservasFuturas={reservasFuturas}
+        mostrarContadores
       />
       <TablaReservas
         dataListadoReservas={dataFiltrada}

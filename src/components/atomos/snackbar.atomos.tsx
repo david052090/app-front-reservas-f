@@ -1,5 +1,5 @@
 import { MaterialDesignContent, SnackbarProvider } from "notistack";
-import { GlobalStyles, styled } from "@mui/material";
+import { styled } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
