@@ -1,4 +1,5 @@
 import { IDataReservas } from "./reservas.interface";
+import { Dayjs } from "dayjs";
 export interface FormInputsRegistrar {
   nombre: string;
   nombre_restaurante: string;
@@ -26,8 +27,8 @@ export interface FormValues {
   nombre_cliente: string;
   celular: string;
   cantidad_personas: number;
-  fecha: string;
-  hora: string;
+  fecha: string | Dayjs;
+  hora: string | Dayjs;
   tipo_reserva: string;
   numero_mesa: number;
   estado_reserva: boolean;
