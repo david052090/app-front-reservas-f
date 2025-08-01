@@ -1,12 +1,7 @@
 import TablaEncabezado from "./TablaEncabezado.moleculas";
 import { ENCABEZADO_TABLA_GESTIONAR_AMBIENTES } from "../../constants/global.constants";
-import {
-  IListadoReservas,
-  IDataReservas,
-} from "../../interface/reservas.interface";
 import formatearFecha from "../../utils/formatearFecha";
 import {
-  Box,
   Paper,
   Table,
   TableBody,
@@ -14,17 +9,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   CircularProgress,
 } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { useState } from "react";
-import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
-import Tooltip from "@mui/material/Tooltip";
-import IconButton from "@mui/material/IconButton";
-import dayjs from "dayjs";
 import { IListadoGestionAmbientes } from "../../interface/ambientes.interface";
 
 const TablaGestionarRegistroAmbientes = ({

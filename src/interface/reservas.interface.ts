@@ -7,7 +7,9 @@ export interface IDataReservas {
   cantidad_personas: number;
   numero_mesa: number;
   tipo_reserva: string;
-  estado_reserva: string;
+  estado_reserva: number;
+  observacion: string;
+  ubicacion: string;
 }
 export interface IListadoReservas {
   dataListadoReservas: IDataReservas[];

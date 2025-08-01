@@ -1,9 +1,6 @@
 import TablaEncabezado from "./TablaEncabezado.moleculas";
 import { ENCABEZADO_TABLA_RESERVAS } from "../../constants/global.constants";
-import {
-  IListadoReservas,
-  IDataReservas,
-} from "../../interface/reservas.interface";
+import { IListadoReservas } from "../../interface/reservas.interface";
 import formatearFecha from "../../utils/formatearFecha";
 import {
   Box,
@@ -20,12 +17,11 @@ import {
 } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+//import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import dayjs from "dayjs";
 
 const TablaReservas = ({
   dataListadoReservas,
@@ -52,7 +48,7 @@ const TablaReservas = ({
   };
 
   const handleClick = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    _event: React.ChangeEvent<HTMLInputElement>,
     id: number,
     row: (typeof dataListadoReservas)[0]
   ) => {

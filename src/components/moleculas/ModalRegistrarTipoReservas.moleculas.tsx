@@ -1,20 +1,10 @@
 import Modal from "./Modal.moleculas";
-import { Box, TextField, MenuItem } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { registrarTipoReserva } from "../../api/consultarTipoReservas.ts";
 import { useState } from "react";
-import {
-  FormValues,
-  IModalRegistroReservas,
-} from "../../interface/formularios.interface";
 import { useSnackbar } from "notistack";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/es";
-import dayjs from "dayjs";
-import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { UBICACIONES } from "../../constants/global.constants";
 import { IModalRegistroTipoReservas } from "../../interface/formularios.interface";
 
 interface IFormTipoReservas {
@@ -38,7 +28,6 @@ const ModalRegistrarTipoReservas = ({
     },
   });
   const onSubmit = async (data: IFormTipoReservas) => {
-    const userId = localStorage.getItem("userId");
     try {
       setCargandoBtn(true);
       const respuesta = await registrarTipoReserva(

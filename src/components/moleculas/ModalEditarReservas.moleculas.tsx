@@ -18,14 +18,14 @@ import "dayjs/locale/es";
 import { actualizarReserva } from "../../api/consultarReservas";
 import { getListaAmbientes } from "../../utils/obtenerAmbientes";
 import {
-  ITiposAmbientes,
-  ITiposReservas,
-} from "../../interface/formularios.interface";
-import {
   IModalEditarReserva,
   FormValues,
 } from "../../interface/formularios.interface";
 import { obtenerTiposReserva } from "../../api/consultarTipoReservas.ts";
+import {
+  ITiposAmbientesReservas,
+  ITiposReservas,
+} from "../../interface/formularios.interface";
 
 const ModalEditarReserva = ({
   abrirModalEditar,
@@ -38,7 +38,7 @@ const ModalEditarReserva = ({
   const { enqueueSnackbar } = useSnackbar();
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
   const [listarTipoAmbientes, setListarTipoAmbientes] = useState<
-    ITiposAmbientes[]
+    ITiposAmbientesReservas[]
   >([]);
   const [listarTipoReservas, setListarTipoReservas] = useState<
     ITiposReservas[]
@@ -68,7 +68,7 @@ const ModalEditarReserva = ({
       reset({
         ...reservaEditar,
         fecha: dayjs(reservaEditar.fecha),
-        hora: dayjs(reservaEditar.hora, "HH:mm"),
+        hora: dayjs(reservaEditar.hora, "hh:mm A"),
         estado_reserva: reservaEditar.estado_reserva,
       });
       listarAmbientes();
@@ -85,7 +85,7 @@ const ModalEditarReserva = ({
         ...data,
         id: reservaEditar?.id as number, // forzamos que no sea undefined
         fecha: dayjs(data.fecha).format("YYYY-MM-DD"),
-        hora: dayjs(data.hora).format("HH:mm"),
+        hora: dayjs(data.hora).format("hh:mm A"),
         estado_reserva: data.estado_reserva,
       });
 
@@ -218,17 +218,16 @@ const ModalEditarReserva = ({
             render={({ field }) => (
               <DatePicker
                 label="Fecha"
-                value={field.value}
+                value={dayjs(field.value)}
                 onChange={(date) => field.onChange(date)}
                 minDate={dayjs()}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    error={!!errors.fecha}
-                    helperText={errors.fecha?.message}
-                  />
-                )}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!errors.fecha,
+                    helperText: errors.fecha?.message,
+                  },
+                }}
               />
             )}
           />
@@ -243,16 +242,15 @@ const ModalEditarReserva = ({
             render={({ field }) => (
               <TimePicker
                 label="Hora"
-                value={field.value}
+                value={dayjs(field.value)}
                 onChange={(time) => field.onChange(time)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    fullWidth
-                    error={!!errors.hora}
-                    helperText={errors.hora?.message}
-                  />
-                )}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    error: !!errors.hora,
+                    helperText: errors.hora?.message,
+                  },
+                }}
               />
             )}
           />

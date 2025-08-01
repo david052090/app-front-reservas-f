@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Box, Button, TextField, Typography, Paper, Link } from "@mui/material";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
-import axios from "axios";
 import { FormInputsRegistrar } from "../../../interface/formularios.interface";
 import { registrarUsuario } from "../../../api/autenticacionUsuarios.ts";
 const RegistroUsuario = () => {

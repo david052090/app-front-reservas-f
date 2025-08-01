@@ -5,6 +5,6 @@ export interface IListaTiposReservas {
 }
 
 export interface IListadoGestionTiposReservas {
-  dataListadoTiposReservas: IListaAmbientes[];
+  dataListadoTiposReservas: IListaTiposReservas[];
   cargando: boolean;
 }
