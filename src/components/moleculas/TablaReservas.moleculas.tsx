@@ -34,7 +34,7 @@ const TablaReservas = ({
   selectedData,
 }: IListadoReservas) => {
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -274,7 +274,7 @@ const TablaReservas = ({
       >
         <TablePagination
           sx={{ color: "#0779cc", fontSize: "400" }}
-          rowsPerPageOptions={[10, 30, 50, 100, 200]}
+          rowsPerPageOptions={[50, 100, 200]}
           count={dataListadoReservas.length}
           rowsPerPage={rowsPerPage}
           page={page}
