@@ -53,11 +53,11 @@ const ModalEditarReserva = ({
       nombre_cliente: "",
       celular: "",
       cantidad_personas: 0,
-      fecha: null,
-      hora: null,
+      fecha: "",
+      hora: "",
       tipo_reserva: "",
       numero_mesa: 0,
-      estado_reserva: true ? 1 : 0,
+      estado_reserva: true,
       ubicacion: "",
       observacion: "",
     },
@@ -67,9 +67,9 @@ const ModalEditarReserva = ({
     if (reservaEditar) {
       reset({
         ...reservaEditar,
-        fecha: dayjs(reservaEditar.fecha),
+        fecha: dayjs(reservaEditar.fecha).format("YYYY-MM-DD"),
         hora: dayjs(reservaEditar.hora, "hh:mm A"),
-        estado_reserva: reservaEditar.estado_reserva,
+        estado_reserva: reservaEditar.estado_reserva === 1,
       });
       listarAmbientes();
       listarDataTipoReservas();
@@ -79,8 +79,6 @@ const ModalEditarReserva = ({
   const onSubmit = async (data: FormValues) => {
     try {
       setCargandoBtn(true);
-      const userId = localStorage.getItem("userId");
-
       await actualizarReserva({
         ...data,
         id: reservaEditar?.id as number, // forzamos que no sea undefined
