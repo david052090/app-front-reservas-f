@@ -1,9 +1,8 @@
 // Frontend: src/components/LoginUsuario.tsx
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Box, Button, TextField, Typography, Paper, Link } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
-import axios from "axios";
+import { Box, Button, TextField, Typography, Paper } from "@mui/material";
+//import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { LoginInputs } from "../../../interface/formularios.interface";
 import { loginUsuario } from "../../../api/autenticacionUsuarios.ts";

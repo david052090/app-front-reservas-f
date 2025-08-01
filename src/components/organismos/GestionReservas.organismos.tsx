@@ -6,7 +6,6 @@ import ModalRegistroReservas from "../moleculas/ModalRegistroReservas.moleculas"
 import { IDataReservas } from "../../interface/reservas.interface";
 import ModalEditarReserva from "../moleculas/ModalEditarReservas.moleculas";
 import dayjs, { Dayjs } from "dayjs";
-import { getListaAmbientes } from "../../utils/obtenerAmbientes";
 
 const GestionReservas = () => {
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
@@ -58,9 +57,7 @@ const GestionReservas = () => {
 
   const calcularCantidadReservas = () => {
     const hoy = dayjs();
-    const confirmadas = listarReservas.filter(
-      (r) => r.estado_reserva === 1 || r.estado_reserva === true
-    );
+    const confirmadas = listarReservas.filter((r) => r.estado_reserva === 1);
 
     const hoyConfirmadas = confirmadas.filter((r) =>
       dayjs(r.fecha).isSame(hoy, "day")

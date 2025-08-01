@@ -3,6 +3,7 @@ import TablaGestionarTiposReservas from "../moleculas/TablaGestionarTiposReserva
 import { useState, useEffect } from "react";
 import ModalRegistrarTipoReservas from "../moleculas/ModalRegistrarTipoReservas.moleculas";
 import { obtenerTiposReserva } from "../../api/consultarTipoReservas.ts";
+import { IListaTiposReservas } from "../../interface/tiposReservas.interface";
 const GestionRegistroTipoReservas = () => {
   const [abrirModalTipoReservas, setAbrirModalTipoReservas] =
     useState<boolean>(false);

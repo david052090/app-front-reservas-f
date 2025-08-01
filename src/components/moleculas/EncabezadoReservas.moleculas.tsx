@@ -24,10 +24,10 @@ interface IEncabezadoReservas {
   filtroFecha?: Dayjs | null;
   setFiltroFecha?: React.Dispatch<React.SetStateAction<Dayjs | null>>;
   mostrarBuscador?: boolean;
-  mostrarFecha: boolean;
+  mostrarFecha?: boolean;
   reservasHoy?: number;
   reservasFuturas?: number;
-  mostrarContadores: boolean;
+  mostrarContadores?: boolean;
 }
 export default function EncabezadoReservas({
   setAbrirModalReservas,

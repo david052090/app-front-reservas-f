@@ -22,6 +22,7 @@ export interface ITiposReservas {
   nombre_tipo_reserva: string;
 }
 export interface FormValues {
+  id?: number;
   nombre_cliente: string;
   celular: string;
   cantidad_personas: number;
@@ -53,7 +54,7 @@ export interface IModalRegistroTipoReservas {
 export interface IModalEditarReserva {
   abrirModalEditar: boolean;
   setAbrirModalEditar: React.Dispatch<React.SetStateAction<boolean>>;
-  reservaEditar: FormValues | null;
+  reservaEditar: IDataReservas | null;
   actualizarData: () => void;
   setSelected: React.Dispatch<React.SetStateAction<number[]>>;
   setSelectedData: React.Dispatch<React.SetStateAction<IDataReservas[]>>;

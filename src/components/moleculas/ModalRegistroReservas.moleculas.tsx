@@ -14,9 +14,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/es";
 import dayjs from "dayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
-import { UBICACIONES } from "../../constants/global.constants";
 import { getListaAmbientes } from "../../utils/obtenerAmbientes";
-import { ITiposAmbientes } from "../../interface/formularios.interface";
+import {
+  ITiposAmbientesReservas,
+  ITiposReservas,
+} from "../../interface/formularios.interface";
 import { obtenerTiposReserva } from "../../api/consultarTipoReservas.ts";
 const ModalRegistroReservas = ({
   setAbrirModalReservas,
@@ -26,7 +28,7 @@ const ModalRegistroReservas = ({
   const { enqueueSnackbar } = useSnackbar();
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
   const [listarTipoAmbientes, setListarTipoAmbientes] = useState<
-    ITiposAmbientes[]
+    ITiposAmbientesReservas[]
   >([]);
   const [listarTipoReservas, setListarTipoReservas] = useState<
     ITiposReservas[]
@@ -40,12 +42,12 @@ const ModalRegistroReservas = ({
     defaultValues: {
       nombre_cliente: "",
       celular: "",
-      cantidad_personas: null,
+      cantidad_personas: 0,
       fecha: null,
       hora: null,
       tipo_reserva: "",
-      numero_mesa: null,
-      estado_reserva: true ? 1 : 0,
+      numero_mesa: 0,
+      estado_reserva: true,
       ubicacion: "",
       observacion: "",
     },
@@ -59,12 +61,10 @@ const ModalRegistroReservas = ({
   }, [abrirModalReservas]);
 
   const onSubmit = async (data: FormValues) => {
-    const userId = localStorage.getItem("userId");
     try {
       setCargandoBtn(true);
       const dataResponse = await dataRegistrarReserva({
         ...data,
-        userId,
         fecha: dayjs(data.fecha).format("YYYY-MM-DD"),
         hora: dayjs(data.hora).format("hh:mm A"),
       });
@@ -192,7 +192,7 @@ const ModalRegistroReservas = ({
             render={({ field }) => (
               <DatePicker
                 label="Fecha"
-                value={field.value}
+                value={dayjs(field.value)}
                 onChange={(date) => field.onChange(date)}
                 minDate={dayjs()}
                 slotProps={{
@@ -202,7 +202,6 @@ const ModalRegistroReservas = ({
                     helperText: errors.fecha?.message,
                   },
                 }}
-                renderInput={(params) => <TextField {...params} fullWidth />}
               />
             )}
           />
@@ -217,7 +216,7 @@ const ModalRegistroReservas = ({
             render={({ field }) => (
               <TimePicker
                 label="Hora"
-                value={field.value}
+                value={dayjs(field.value)}
                 onChange={(time) => field.onChange(time)}
                 slotProps={{
                   textField: {
@@ -226,7 +225,6 @@ const ModalRegistroReservas = ({
                     helperText: errors.hora?.message,
                   },
                 }}
-                renderInput={(params) => <TextField {...params} fullWidth />}
               />
             )}
           />
