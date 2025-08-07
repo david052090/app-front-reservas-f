@@ -1,6 +1,9 @@
 import TablaEncabezado from "./TablaEncabezado.moleculas";
 import { ENCABEZADO_TABLA_RESERVAS } from "../../constants/global.constants";
-import { IListadoReservas } from "../../interface/reservas.interface";
+import {
+  IListadoReservas,
+  IDataReservas,
+} from "../../interface/reservas.interface";
 import formatearFecha from "../../utils/formatearFecha";
 import {
   Box,
@@ -22,6 +25,7 @@ import { useState } from "react";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
+import dayjs from "dayjs";
 
 const TablaReservas = ({
   dataListadoReservas,
@@ -88,6 +92,19 @@ const TablaReservas = ({
     dataListadoReservas.length > 0 &&
     selected.length === dataListadoReservas.length;
   const isIndeterminate = selected.length > 0 && !allSelected;
+
+  const mostrarColor = (row: IDataReservas) => {
+    const isToday = dayjs(row.fecha).isSame(dayjs(), "day");
+    const isFuture = dayjs(row.fecha).isAfter(dayjs(), "day");
+    if (isToday && row.estado_reserva === 1) {
+      return "green";
+    }
+    if (isFuture && row.estado_reserva === 1) {
+      return "orange";
+    } else {
+      return "transparent";
+    }
+  };
   return (
     <Paper
       sx={{ width: { xs: "250px", md: "100%" }, my: 3, overflowX: "auto" }}
@@ -158,14 +175,30 @@ const TablaReservas = ({
                 ) : (
                   <>
                     {visibleRows.map((row) => {
+                      const estadoColor = mostrarColor(row);
                       return (
                         <TableRow hover tabIndex={-1} key={row.id}>
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              color="primary"
-                              checked={selected.includes(row.id)}
-                              onChange={(e) => handleClick(e, row.id, row)}
+                          <TableCell
+                            padding="checkbox"
+                            sx={{ position: "relative", pl: 0 }}
+                          >
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                left: 0,
+                                top: 0,
+                                bottom: 0,
+                                width: "4px",
+                                bgcolor: estadoColor,
+                              }}
                             />
+                            <Box sx={{ ml: "8px" }}>
+                              <Checkbox
+                                color="primary"
+                                checked={selected.includes(row.id)}
+                                onChange={(e) => handleClick(e, row.id, row)}
+                              />
+                            </Box>
                           </TableCell>
                           <TableCell
                             component="th"
