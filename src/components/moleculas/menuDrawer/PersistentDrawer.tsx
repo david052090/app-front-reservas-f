@@ -1,6 +1,7 @@
 import * as React from "react";
 import { jwtDecode } from "jwt-decode";
 import { styled, useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -26,24 +27,28 @@ import BentoOutlinedIcon from "@mui/icons-material/BentoOutlined";
 import BarChartIcon from "@mui/icons-material/BarChart";
 const drawerWidth = 240;
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
+const Main = styled("main", {
+  shouldForwardProp: (prop) => prop !== "open" && prop !== "isMobile",
+})<{
   open?: boolean;
-}>(({ theme, open }) => ({
+  isMobile: boolean;
+}>(({ theme, open, isMobile }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: `-${drawerWidth}px`,
-  ...(open && {
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
+  marginLeft: isMobile ? 0 : `-${drawerWidth}px`,
+  ...(open &&
+    !isMobile && {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+      paddingTop: 10,
     }),
-    marginLeft: 0,
-    paddingTop: 10,
-  }),
 }));
 
 interface AppBarProps extends MuiAppBarProps {
@@ -51,20 +56,21 @@ interface AppBarProps extends MuiAppBarProps {
 }
 
 const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
+  shouldForwardProp: (prop) => prop !== "open" && prop !== "isMobile",
+})<AppBarProps & { isMobile: boolean }>(({ theme, open, isMobile }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  ...(open && {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
+  ...(open &&
+    !isMobile && {
+      width: `calc(100% - ${drawerWidth}px)`,
+      marginLeft: drawerWidth,
+      transition: theme.transitions.create(["margin", "width"], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
     }),
-  }),
 }));
 
 const DrawerHeader = styled("div")(({ theme }) => ({
@@ -81,10 +87,15 @@ export default function PersistentDrawer({
   children: React.ReactNode;
 }) {
   const theme = useTheme();
-  const [open, setOpen] = useState<boolean>(true);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // <-- Detectamos si es pantalla pequeña
+  const [open, setOpen] = React.useState(!isMobile);
   const location = useLocation();
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string>("Dashboard");
+
+  useEffect(() => {
+    setOpen(!isMobile); // <-- Sincronizamos estado open con isMobile
+  }, [isMobile]);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -114,7 +125,7 @@ export default function PersistentDrawer({
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={open} isMobile={isMobile}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -146,9 +157,11 @@ export default function PersistentDrawer({
             boxSizing: "border-box",
           },
         }}
-        variant="persistent"
+        variant={isMobile ? "temporary" : "persistent"}
         anchor="left"
         open={open}
+        onClose={handleDrawerClose} // <-- Necesario para temporary en móvil
+        ModalProps={{ keepMounted: true }}
       >
         <DrawerHeader>
           <Typography>Dashboard</Typography>
@@ -218,8 +231,8 @@ export default function PersistentDrawer({
           </ListItem>
         </List>
       </Drawer>
-      <Main open={open}>
-        <DrawerHeader />
+      <Main open={open} isMobile={isMobile}>
+        <Box sx={{ ...theme.mixins.toolbar }} />
         {children}
       </Main>
     </Box>

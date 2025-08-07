@@ -56,10 +56,17 @@ export default function EncabezadoReservas({
   return (
     <Box
       sx={{
+        width: { xs: "250px", md: "100%" },
         display: "flex",
+        flexWrap: "wrap",
+        flexDirection: { xs: "column", sm: "row" },
         justifyContent:
-          !mostrarBuscador && !mostrarFecha ? "flex-end" : "space-between",
-        paddingBottom: 1,
+          !mostrarBuscador && !mostrarContadores && !mostrarFecha
+            ? "flex-end"
+            : "space-between",
+        alignItems: "center",
+        pb: 1,
+        gap: { xs: 1, sm: 2 },
       }}
     >
       {mostrarBuscador && (
@@ -71,8 +78,8 @@ export default function EncabezadoReservas({
             borderRadius: "999px",
             px: 1.5,
             height: 38,
-            minWidth: 250,
-            marginRight: 2,
+            flex: { xs: 1, sm: "0 0 auto" },
+            minWidth: { xs: "100%", sm: 250 },
           }}
         >
           <SearchIcon sx={{ color: "#888", mr: 1 }} />
@@ -92,7 +99,14 @@ export default function EncabezadoReservas({
         </Box>
       )}
       {mostrarContadores && (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, mr: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            order: { xs: 3, sm: 2 },
+          }}
+        >
           <Tooltip title="Reservas confirmadas para hoy" arrow>
             <Box
               sx={{
@@ -138,8 +152,12 @@ export default function EncabezadoReservas({
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: 1,
+          flexWrap: "wrap",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: "center",
+          gap: { xs: 1, sm: 2 },
+          order: { xs: 2, sm: 3 },
+          width: { xs: "100%", sm: "auto" },
         }}
       >
         {mostrarFecha && (
@@ -154,8 +172,8 @@ export default function EncabezadoReservas({
                   sx: {
                     backgroundColor: "#f0f0f0",
                     borderRadius: "10px",
-                    width: 180,
-                    marginRight: "25px",
+                    width: { xs: "100%", sm: 180 },
+                    mr: { xs: 0, sm: "25px" },
                   },
                   InputProps: filtroFecha
                     ? {
@@ -180,13 +198,18 @@ export default function EncabezadoReservas({
 
         <IconButton
           onClick={actualizarTabla}
-          sx={{ marginRight: "25px", backgroundColor: "#f0f0f0" }}
+          sx={{
+            backgroundColor: "#f0f0f0",
+            display: { xs: "none", sm: "inline-flex" },
+            mr: { xs: 0, sm: "25px" },
+          }}
         >
           <ReplayIcon />
         </IconButton>
         <BotonRedondo
           texto={"Nueva"}
           icono={<AddIcon />}
+          width={{ xs: "100%", sm: "auto" }}
           onClick={() => setAbrirModalReservas(true)}
         />
       </Box>

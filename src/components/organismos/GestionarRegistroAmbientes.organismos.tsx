@@ -4,6 +4,7 @@ import ModalRegistrarAmbiente from "../moleculas/ModalRegistrarAmbiente.molecula
 import { useState, useEffect } from "react";
 import { IListaAmbientes } from "../../interface/ambientes.interface";
 import { getListaAmbientes } from "../../utils/obtenerAmbientes";
+import { Box } from "@mui/material";
 const GestionarRegistroAmbientes = () => {
   const [abrirModalAmbiente, setAbrirModalAmbiente] = useState<boolean>(false);
   const [listarDataAmbientes, setListarDataAmbientes] = useState<
@@ -28,14 +29,24 @@ const GestionarRegistroAmbientes = () => {
   };
   return (
     <>
-      <EncabezadoReservas
-        setAbrirModalReservas={setAbrirModalAmbiente}
-        actualizarTabla={() => listarAmbientes()}
-      />
-      <TablaGestionarRegistroAmbientes
-        dataListadoAmbientes={listarDataAmbientes}
-        cargando={cargando}
-      />
+      <Box
+        sx={{
+          width: { xs: "auto", md: "700px" },
+          maxWidth: { xs: "100vw", md: "none" },
+          mx: 0,
+          px: 0,
+        }}
+      >
+        <EncabezadoReservas
+          setAbrirModalReservas={setAbrirModalAmbiente}
+          actualizarTabla={() => listarAmbientes()}
+        />
+        <TablaGestionarRegistroAmbientes
+          dataListadoAmbientes={listarDataAmbientes}
+          cargando={cargando}
+        />
+      </Box>
+
       <ModalRegistrarAmbiente
         setAbrirModalAmbiente={setAbrirModalAmbiente}
         abrirModalAmbiente={abrirModalAmbiente}

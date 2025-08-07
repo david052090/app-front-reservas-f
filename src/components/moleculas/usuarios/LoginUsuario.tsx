@@ -32,7 +32,13 @@ export const LoginUsuario = () => {
   return (
     <Paper
       elevation={3}
-      sx={{ p: 4, maxWidth: 400, width: "400px", mx: "auto", mt: 8 }}
+      sx={{
+        p: { xs: 2, sm: 4 },
+        width: { xs: "100%", sm: 400 },
+        maxWidth: 400,
+        mx: "auto",
+        mt: { xs: 4, sm: 8 },
+      }}
     >
       <Typography variant="h5" gutterBottom sx={{ marginBottom: "20px" }}>
         Iniciar Sesión

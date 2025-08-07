@@ -18,7 +18,9 @@ const TablaGestionarTiposReservas = ({
   cargando,
 }: IListadoGestionTiposReservas) => {
   return (
-    <Paper sx={{ width: "700px", my: 3, overflow: "hidden" }}>
+    <Paper
+      sx={{ width: { xs: "250px", md: "100%" }, my: 3, overflowX: "auto" }}
+    >
       <TableContainer
         sx={{
           maxHeight: dataListadoTiposReservas.length > 7 ? "550px" : "auto",

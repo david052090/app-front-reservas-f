@@ -6,6 +6,7 @@ import ModalRegistroReservas from "../moleculas/ModalRegistroReservas.moleculas"
 import { IDataReservas } from "../../interface/reservas.interface";
 import ModalEditarReserva from "../moleculas/ModalEditarReservas.moleculas";
 import dayjs, { Dayjs } from "dayjs";
+import { Box } from "@mui/material";
 
 const GestionReservas = () => {
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
@@ -71,29 +72,38 @@ const GestionReservas = () => {
   };
   return (
     <>
-      <EncabezadoReservas
-        setAbrirModalReservas={setAbrirModalReservas}
-        actualizarTabla={() => getListarReservas()}
-        filtro={filtro}
-        setFiltro={setFiltro}
-        filtroFecha={filtroFecha}
-        setFiltroFecha={setFiltroFecha}
-        mostrarBuscador
-        mostrarFecha
-        reservasHoy={reservasHoy}
-        reservasFuturas={reservasFuturas}
-        mostrarContadores
-      />
-      <TablaReservas
-        dataListadoReservas={dataFiltrada}
-        cargando={cargando}
-        setAbrirModalEditar={setAbrirModalEditar}
-        setReservaEditar={setReservaEditar}
-        setSelected={setSelected}
-        selected={selected}
-        setSelectedData={setSelectedData}
-        selectedData={selectedData}
-      />
+      <Box
+        sx={{
+          width: { xs: "auto", md: "1040px" },
+          maxWidth: { xs: "100vw", md: "none" },
+          mx: 0,
+          px: 0,
+        }}
+      >
+        <EncabezadoReservas
+          setAbrirModalReservas={setAbrirModalReservas}
+          actualizarTabla={() => getListarReservas()}
+          filtro={filtro}
+          setFiltro={setFiltro}
+          filtroFecha={filtroFecha}
+          setFiltroFecha={setFiltroFecha}
+          mostrarBuscador
+          mostrarFecha
+          reservasHoy={reservasHoy}
+          reservasFuturas={reservasFuturas}
+          mostrarContadores
+        />
+        <TablaReservas
+          dataListadoReservas={dataFiltrada}
+          cargando={cargando}
+          setAbrirModalEditar={setAbrirModalEditar}
+          setReservaEditar={setReservaEditar}
+          setSelected={setSelected}
+          selected={selected}
+          setSelectedData={setSelectedData}
+          selectedData={selectedData}
+        />
+      </Box>
       <ModalRegistroReservas
         setAbrirModalReservas={setAbrirModalReservas}
         abrirModalReservas={abrirModalReservas}
