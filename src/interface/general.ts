@@ -30,7 +30,7 @@ export interface IBotonRedondo {
   disabled?: boolean;
   isReporte?: boolean;
   isDownloading?: boolean;
-  width?: string;
+  width?: object;
 }
 export interface EstadisticaMensual {
   mes: number;

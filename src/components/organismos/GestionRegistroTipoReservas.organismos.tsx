@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import ModalRegistrarTipoReservas from "../moleculas/ModalRegistrarTipoReservas.moleculas";
 import { obtenerTiposReserva } from "../../api/consultarTipoReservas.ts";
 import { IListaTiposReservas } from "../../interface/tiposReservas.interface";
+import { Box } from "@mui/material";
 const GestionRegistroTipoReservas = () => {
   const [abrirModalTipoReservas, setAbrirModalTipoReservas] =
     useState<boolean>(false);
@@ -30,14 +31,24 @@ const GestionRegistroTipoReservas = () => {
   };
   return (
     <>
-      <EncabezadoReservas
-        setAbrirModalReservas={setAbrirModalTipoReservas}
-        actualizarTabla={() => listarDataTipoReservas()}
-      />
-      <TablaGestionarTiposReservas
-        dataListadoTiposReservas={listarTipoReservas}
-        cargando={cargando}
-      />
+      <Box
+        sx={{
+          width: { xs: "auto", md: "700px" },
+          maxWidth: { xs: "100vw", md: "none" },
+          mx: 0,
+          px: 0,
+        }}
+      >
+        <EncabezadoReservas
+          setAbrirModalReservas={setAbrirModalTipoReservas}
+          actualizarTabla={() => listarDataTipoReservas()}
+        />
+        <TablaGestionarTiposReservas
+          dataListadoTiposReservas={listarTipoReservas}
+          cargando={cargando}
+        />
+      </Box>
+
       <ModalRegistrarTipoReservas
         setAbrirModalTipoReservas={setAbrirModalTipoReservas}
         abrirModalTipoReservas={abrirModalTipoReservas}

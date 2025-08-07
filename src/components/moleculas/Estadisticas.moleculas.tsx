@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { obtenerEstadisticasMensuales } from "../../api/estadisticas";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { EstadisticaMensual } from "../../interface/general";
 
 const meses = [
@@ -22,6 +22,8 @@ const meses = [
 
 export default function EstadisticasChart() {
   const [data, setData] = useState<EstadisticaMensual[]>([]);
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     obtenerEstadisticasMensuales()
@@ -50,13 +52,21 @@ export default function EstadisticasChart() {
   const confirmadas = mesesCompletos.map((item) => item.confirmadas);
   const canceladas = mesesCompletos.map((item) => item.canceladas);
 
+  const chartHeight = isSmall ? 250 : 400;
   return (
-    <Box sx={{ width: "1000px", maxWidth: 1000 }}>
+    <Box
+      sx={{
+        width: { xs: "auto", md: "1000px" },
+        maxWidth: { xs: "100vw", md: "none" },
+        mx: 0,
+        px: 0,
+      }}
+    >
       <Typography variant="h6" mb={2}>
         Estadísticas de Reservas ({anioActual})
       </Typography>
       <BarChart
-        height={400}
+        height={chartHeight}
         xAxis={[{ id: "mes", data: labels, scaleType: "band" }]}
         series={[
           { data: confirmadas, label: "Confirmadas", color: "#4caf50" },

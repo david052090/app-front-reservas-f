@@ -89,7 +89,9 @@ const TablaReservas = ({
     selected.length === dataListadoReservas.length;
   const isIndeterminate = selected.length > 0 && !allSelected;
   return (
-    <Paper sx={{ minWidth: "1000px", my: 3, overflow: "hidden" }}>
+    <Paper
+      sx={{ width: { xs: "250px", md: "100%" }, my: 3, overflowX: "auto" }}
+    >
       <TableContainer
         sx={{
           maxHeight: "500px",
