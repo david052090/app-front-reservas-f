@@ -1,6 +1,6 @@
-// src/components/atomos/ProtectedRoute.tsx
+// src/components/atomos/LoggedOutOnlyRoute.tsx
 import React, { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { setAuthFromStorage } from "../../store/authSlice";
@@ -9,27 +9,21 @@ import { Box, CircularProgress } from "@mui/material";
 
 type Props = { children: React.ReactNode };
 
-export const ProtectedRoute: React.FC<Props> = ({ children }) => {
-  const location = useLocation();
+export const LoggedOutOnlyRoute: React.FC<Props> = ({ children }) => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((s: RootState) => s.auth.isAuthenticated);
-
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Si Redux dice que ya está autenticado, no hay que revisar nada
     if (isAuthenticated) {
       setChecking(false);
       return;
     }
-    // Fallback: validar token persistido
     const token = localStorage.getItem("authToken");
     if (token && esTokenValido(token)) {
       dispatch(setAuthFromStorage(token));
-      setChecking(false);
-    } else {
-      setChecking(false);
     }
+    setChecking(false);
   }, [dispatch, isAuthenticated]);
 
   if (checking) {
@@ -45,9 +39,9 @@ export const ProtectedRoute: React.FC<Props> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    // Guardamos a dónde iba para volver después del login
-    return <Navigate to="/login" replace state={{ from: location }} />;
+  // Si ya está autenticado, fuera del login
+  if (isAuthenticated) {
+    return <Navigate to="/reservas" replace />;
   }
 
   return <>{children}</>;

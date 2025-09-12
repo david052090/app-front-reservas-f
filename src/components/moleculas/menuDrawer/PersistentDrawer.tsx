@@ -21,10 +21,19 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AddHomeOutlinedIcon from "@mui/icons-material/AddHomeOutlined";
 import BentoOutlinedIcon from "@mui/icons-material/BentoOutlined";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../store/store"; // ajusta ruta
+import { logout, setAuthFromStorage } from "../../../store/authSlice"; // ajusta ruta
+import {
+  esTokenValido,
+  handleStorageAuth,
+  handleVisibilityAuth,
+} from "../../../utils/esTokenValido"; // ajusta ruta
+import { CircularProgress } from "@mui/material";
 const drawerWidth = 240;
 
 const Main = styled("main", {
@@ -91,24 +100,34 @@ export default function PersistentDrawer({
   const [open, setOpen] = React.useState(!isMobile);
   const location = useLocation();
   const navigate = useNavigate();
-  const [userName, setUserName] = useState<string>("Dashboard");
-
+  const dispatch = useDispatch();
+  const { isAuthenticated, token } = useSelector((s: RootState) => s.auth);
+  const [checking, setChecking] = useState(true);
   useEffect(() => {
     setOpen(!isMobile); // <-- Sincronizamos estado open con isMobile
   }, [isMobile]);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    console.log("token", token);
-    if (token) {
-      try {
-        const decoded: { nombre_restaurante: string } = jwtDecode(token);
-        setUserName(decoded.nombre_restaurante);
-      } catch (error) {
-        console.error("Invalid token", error);
-      }
+    if (isAuthenticated) {
+      setChecking(false);
+      return;
     }
-  }, []);
+    const stored = localStorage.getItem("authToken");
+    if (stored && esTokenValido(stored)) {
+      dispatch(setAuthFromStorage(stored));
+    }
+    setChecking(false);
+  }, [dispatch, isAuthenticated]);
+
+  const userName = useMemo(() => {
+    if (!token) return "Dashboard";
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded?.nombre_restaurante || "Dashboard";
+    } catch {
+      return "Dashboard";
+    }
+  }, [token]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -118,10 +137,34 @@ export default function PersistentDrawer({
     setOpen(false);
   };
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
+    dispatch(logout());
     navigate("/login");
   };
 
+  useEffect(() => {
+    const listener = handleStorageAuth(dispatch, navigate, location);
+    window.addEventListener("storage", listener);
+    return () => window.removeEventListener("storage", listener);
+  }, [dispatch, navigate, location]);
+
+  useEffect(() => {
+    const listener = handleVisibilityAuth(dispatch, navigate, location);
+    document.addEventListener("visibilitychange", listener);
+    return () => document.removeEventListener("visibilitychange", listener);
+  }, [dispatch, navigate, location]);
+
+  if (checking) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
