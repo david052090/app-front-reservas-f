@@ -6,6 +6,8 @@ import { Box, Button, TextField, Typography, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LoginInputs } from "../../../interface/formularios.interface";
 import { loginUsuario } from "../../../api/autenticacionUsuarios.ts";
+import logoReserva from "../../../assets/logo-reservas.png";
+
 export const LoginUsuario = () => {
   const navigate = useNavigate();
   const {
@@ -20,6 +22,7 @@ export const LoginUsuario = () => {
       setServerError(null);
       const response = await loginUsuario(data);
       if (response.token) {
+        localStorage.setItem("authToken", response.token); // 👈 cambia aquí
         navigate("/reservas");
       } else {
         setServerError("Credenciales inválidas");
@@ -38,8 +41,15 @@ export const LoginUsuario = () => {
         maxWidth: 400,
         mx: "auto",
         mt: { xs: 4, sm: 8 },
+        textAlign: "center",
       }}
     >
+      <Box
+        component="img"
+        src={logoReserva}
+        alt="Logo reservas"
+        sx={{ width: 100 }}
+      />
       <Typography variant="h5" gutterBottom sx={{ marginBottom: "20px" }}>
         Iniciar Sesión
       </Typography>
@@ -72,14 +82,6 @@ export const LoginUsuario = () => {
           {isSubmitting ? "Validando..." : "Entrar"}
         </Button>
       </Box>
-      {/** <Box textAlign="center" mt={2}>
-        <Typography variant="body2">
-          ¿No tienes una cuenta?{" "}
-          <Link component={RouterLink} to="/register">
-            Registrar
-          </Link>
-        </Typography>
-      </Box> */}
     </Paper>
   );
 };
