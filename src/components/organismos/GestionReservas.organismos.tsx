@@ -23,14 +23,20 @@ const GestionReservas = () => {
   const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(null);
   const [reservasHoy, setReservasHoy] = useState<number>(0);
   const [reservasFuturas, setReservasFuturas] = useState<number>(0);
+
   useEffect(() => {
     getListarReservas();
-  }, []);
+  }, [filtroFecha, filtro]);
+
   const getListarReservas = async () => {
+    const fecha = filtroFecha ? dayjs(filtroFecha).format("YYYY-MM-DD") : "";
     try {
       setCargando(true);
       //const userId = localStorage.getItem("userId");
-      const dataListado = await gestionarListadoReservas();
+      const dataListado = await gestionarListadoReservas({
+        fecha,
+        nombreCliente: filtro,
+      });
       setListarReservas(dataListado.reservas);
     } catch (error) {
       console.log("error", error);
@@ -40,21 +46,9 @@ const GestionReservas = () => {
   };
 
   useEffect(() => {
-    const filtrado = listarReservas.filter((reserva) => {
-      const coincideNombre = reserva.nombre_cliente
-        .toLowerCase()
-        .includes(filtro.toLowerCase());
-
-      const coincideFecha = filtroFecha
-        ? dayjs(reserva.fecha).isSame(filtroFecha, "day")
-        : true;
-
-      return coincideNombre && coincideFecha;
-    });
-
-    setDataFiltrada(filtrado);
+    setDataFiltrada(listarReservas);
     calcularCantidadReservas();
-  }, [filtro, filtroFecha, listarReservas]);
+  }, [listarReservas, filtroFecha, filtro]);
 
   const calcularCantidadReservas = () => {
     const hoy = dayjs();

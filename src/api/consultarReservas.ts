@@ -1,9 +1,17 @@
 import axios from "axios";
 import { GESTIONAR_RESERVAS } from "../Env";
 import { FormValues } from "../interface/formularios.interface";
-export async function gestionarListadoReservas() {
+import { IConsultarReservas } from "../interface/reservas.interface";
+export async function gestionarListadoReservas({
+  fecha,
+  nombreCliente,
+}: IConsultarReservas) {
   const token = localStorage.getItem("authToken");
-  const url = GESTIONAR_RESERVAS + `/reservas`;
+  const params = new URLSearchParams();
+  if (fecha) params.append("fecha", fecha);
+  if (nombreCliente) params.append("nombre_cliente", nombreCliente);
+
+  const url = GESTIONAR_RESERVAS + `/reservas?${params.toString()}`;
   return axios
     .get(url, {
       headers: {
