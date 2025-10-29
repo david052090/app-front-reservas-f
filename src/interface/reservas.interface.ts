@@ -21,3 +21,7 @@ export interface IListadoReservas {
   setSelectedData: React.Dispatch<React.SetStateAction<IDataReservas[]>>;
   selectedData: IDataReservas[];
 }
+export interface IConsultarReservas {
+  fecha?: string;
+  nombreCliente?: string;
+}

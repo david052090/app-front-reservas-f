@@ -51,7 +51,11 @@ export default function EncabezadoReservas({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValorBuscador(e.target.value);
-    setFiltro?.(e.target.value);
+  };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      setFiltro?.(valorBuscador.trim());
+    }
   };
   return (
     <Box
@@ -88,6 +92,7 @@ export default function EncabezadoReservas({
             placeholder="Buscar por nombre..."
             value={valorBuscador}
             onChange={handleChange}
+            onKeyDown={handleKeyDown}
             sx={{ flex: 1, fontSize: 14 }}
           />
 
