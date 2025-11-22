@@ -20,7 +20,7 @@ const GestionReservas = () => {
   const [selected, setSelected] = useState<number[]>([]);
   const [selectedData, setSelectedData] = useState<IDataReservas[]>([]);
   const [filtro, setFiltro] = useState("");
-  const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(null);
+  const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(dayjs());
   const [reservasHoy, setReservasHoy] = useState<number>(0);
   const [reservasFuturas, setReservasFuturas] = useState<number>(0);
 

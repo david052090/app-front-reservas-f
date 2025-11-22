@@ -1,6 +1,6 @@
 // este encabezado, contiene el titulo, el buscador retraible, el filtro estado y el boton redondo
 // este componente se comporta como un encabezado base
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import BotonRedondo from "../atomos/BotonRedondo.atomos";
 import AddIcon from "@mui/icons-material/Add";
 import ReplayIcon from "@mui/icons-material/Replay";
@@ -12,23 +12,11 @@ import { useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
 import InputAdornment from "@mui/material/InputAdornment";
 import Tooltip from "@mui/material/Tooltip";
+import CalendarIcon from "@mui/icons-material/CalendarMonth";
+import { IEncabezadoReservas } from "../../interface/reservas.interface";
 
-interface IEncabezadoReservas {
-  setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
-  actualizarTabla: () => void;
-  filtro?: string;
-  setFiltro?: React.Dispatch<React.SetStateAction<string>>;
-  filtroFecha?: Dayjs | null;
-  setFiltroFecha?: React.Dispatch<React.SetStateAction<Dayjs | null>>;
-  mostrarBuscador?: boolean;
-  mostrarFecha?: boolean;
-  reservasHoy?: number;
-  reservasFuturas?: number;
-  mostrarContadores?: boolean;
-}
 export default function EncabezadoReservas({
   setAbrirModalReservas,
   actualizarTabla,
@@ -43,12 +31,11 @@ export default function EncabezadoReservas({
   mostrarContadores,
 }: IEncabezadoReservas) {
   const [valorBuscador, setValorBuscador] = useState<string>(filtro ?? "");
-
+  const [openCalendar, setOpenCalendar] = useState<boolean>(false);
   const handleClear = () => {
     setValorBuscador("");
     setFiltro?.("");
   };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValorBuscador(e.target.value);
   };
@@ -112,24 +99,35 @@ export default function EncabezadoReservas({
             order: { xs: 3, sm: 2 },
           }}
         >
+          <Typography sx={{ fontWeight: "bold" }}>Reservas:</Typography>
+          <Box
+            sx={{
+              backgroundColor: "#1976d2",
+              color: "white",
+              borderRadius: "50%",
+              width: 28,
+              height: 28,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "bold",
+              fontSize: 16,
+              cursor: "default",
+            }}
+          >
+            {(reservasHoy ?? 0) + (reservasFuturas ?? 0)}
+          </Box>
           <Tooltip title="Reservas confirmadas para hoy" arrow>
             <Box
               sx={{
                 backgroundColor: "#4caf50",
                 color: "white",
-                borderRadius: "50%",
-                width: 35,
-                height: 35,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "bold",
-                fontSize: 16,
+                borderRadius: "4px",
+                width: 30,
+                height: 12,
                 cursor: "default",
               }}
-            >
-              {reservasHoy}
-            </Box>
+            ></Box>
           </Tooltip>
 
           <Tooltip title="Reservas próximas confirmadas" arrow>
@@ -137,19 +135,12 @@ export default function EncabezadoReservas({
               sx={{
                 backgroundColor: "#ff9800",
                 color: "white",
-                borderRadius: "50%",
-                width: 35,
-                height: 35,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "bold",
-                fontSize: 16,
+                borderRadius: "4px",
+                width: 30,
+                height: 12,
                 cursor: "default",
               }}
-            >
-              {reservasFuturas}
-            </Box>
+            ></Box>
           </Tooltip>
         </Box>
       )}
@@ -165,42 +156,62 @@ export default function EncabezadoReservas({
           width: { xs: "100%", sm: "auto" },
         }}
       >
-        {mostrarFecha && (
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-            <DatePicker
-              label="Filtrar por fecha"
-              value={filtroFecha}
-              onChange={(nuevaFecha) => setFiltroFecha?.(nuevaFecha)}
-              slotProps={{
-                textField: {
-                  size: "small",
-                  sx: {
-                    backgroundColor: "#f0f0f0",
-                    borderRadius: "10px",
-                    width: { xs: "100%", sm: 180 },
-                    mr: { xs: 0, sm: "25px" },
-                  },
-                  InputProps: filtroFecha
-                    ? {
-                        endAdornment: (
-                          <InputAdornment position="end">
+        <Box
+          sx={{
+            display: "flex",
+            width: "200px",
+            alignItems: "center",
+          }}
+        >
+          {mostrarFecha && (
+            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+              <DatePicker
+                label="Filtrar por fecha"
+                open={openCalendar}
+                onOpen={() => setOpenCalendar(true)}
+                onClose={() => setOpenCalendar(false)}
+                value={filtroFecha}
+                onChange={(nuevaFecha) => setFiltroFecha?.(nuevaFecha)}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    sx: {
+                      backgroundColor: "#f0f0f0",
+                      borderRadius: "10px",
+                      width: { xs: "100%", sm: 180 },
+                      mr: { xs: 0 },
+                    },
+                    InputProps: {
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ gap: 1 }}>
+                          {/* Ícono nativo del Calendario */}
+                          <IconButton
+                            edge="end"
+                            tabIndex={-1}
+                            onClick={() => setOpenCalendar(true)}
+                          >
+                            <CalendarIcon fontSize="small" />
+                          </IconButton>
+
+                          {/* Ícono personalizado para limpiar la fecha */}
+                          {filtroFecha && (
                             <IconButton
                               size="small"
+                              edge="end"
                               onClick={() => setFiltroFecha?.(null)}
-                              sx={{ p: 0.5 }}
                             >
                               <ClearIcon fontSize="small" />
                             </IconButton>
-                          </InputAdornment>
-                        ),
-                      }
-                    : {},
-                },
-              }}
-            />
-          </LocalizationProvider>
-        )}
-
+                          )}
+                        </InputAdornment>
+                      ),
+                    },
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          )}
+        </Box>
         <IconButton
           onClick={actualizarTabla}
           sx={{

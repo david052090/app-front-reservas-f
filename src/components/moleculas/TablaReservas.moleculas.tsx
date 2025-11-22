@@ -101,6 +101,9 @@ const TablaReservas = ({
     }
     if (isFuture && row.estado_reserva === 1) {
       return "orange";
+    }
+    if (isToday || (isFuture && row.estado_reserva === 0)) {
+      return "red";
     } else {
       return "transparent";
     }
