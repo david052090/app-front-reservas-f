@@ -1,3 +1,4 @@
+import { Dayjs } from "dayjs";
 export interface IDataReservas {
   id: number;
   nombre_cliente: string;
@@ -24,4 +25,17 @@ export interface IListadoReservas {
 export interface IConsultarReservas {
   fecha?: string;
   nombreCliente?: string;
+}
+export interface IEncabezadoReservas {
+  setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
+  actualizarTabla: () => void;
+  filtro?: string;
+  setFiltro?: React.Dispatch<React.SetStateAction<string>>;
+  filtroFecha?: Dayjs | null;
+  setFiltroFecha?: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+  mostrarBuscador?: boolean;
+  mostrarFecha?: boolean;
+  reservasHoy?: number;
+  reservasFuturas?: number;
+  mostrarContadores?: boolean;
 }
