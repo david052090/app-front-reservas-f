@@ -49,3 +49,24 @@ export interface ILoginUsuario {
   nombre: string;
   password: string;
 }
+export interface IModal {
+  titulo?: string;
+  isSobrante?: boolean;
+  children: React.ReactNode;
+  onCancelar: () => void;
+  onGuardar?: () => void;
+  loadingBtnGuardar?: boolean;
+  open: boolean;
+  disabledBtnGuardar?: boolean;
+  width?: number | string;
+  height?: number | string;
+  btnGuardar?: string;
+  mostrarBtnCancelar?: boolean;
+  mostrarBtnGuardar?: boolean;
+  switchFooter?: React.ReactNode;
+  tituloJsx?: React.ReactNode;
+  subTitulo?: string;
+  ocultarIconoX?: boolean;
+  borderBottom?: string;
+  paddingDialogActions?: string;
+}
