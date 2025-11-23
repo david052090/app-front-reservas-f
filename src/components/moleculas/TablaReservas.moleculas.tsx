@@ -36,10 +36,13 @@ const TablaReservas = ({
   selected,
   setSelectedData,
   selectedData,
+  setDetalleReserva,
+  setAbrirModalDetalleReservas,
+  setNombreCliente,
 }: IListadoReservas) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);
-
+  console.log("selectedData", selectedData);
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const allIds = dataListadoReservas.map((r) => r.id);
@@ -262,7 +265,11 @@ const TablaReservas = ({
                             sx={{ color: "rgba(0, 0, 0, 0.6)" }}
                           >
                             <Tooltip
-                              title={row.observacion || "Sin observación"}
+                              title={
+                                !row.observacion
+                                  ? "Sin observación"
+                                  : "Click para ver observación"
+                              }
                               arrow
                               componentsProps={{
                                 tooltip: {
@@ -279,6 +286,11 @@ const TablaReservas = ({
                                   size="small"
                                   disabled={!row.observacion}
                                   sx={{ color: "#1976d2" }}
+                                  onClick={() => {
+                                    setDetalleReserva(row.observacion);
+                                    setNombreCliente(row.nombre_cliente);
+                                    setAbrirModalDetalleReservas(true);
+                                  }}
                                 >
                                   <AssignmentOutlinedIcon />
                                 </IconButton>

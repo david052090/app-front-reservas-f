@@ -8,3 +8,10 @@ export interface IListadoGestionTiposReservas {
   dataListadoTiposReservas: IListaTiposReservas[];
   cargando: boolean;
 }
+
+export interface IModalDetalleReservas {
+  abrirModalDetalleReservas: boolean;
+  setAbrirModalDetalleReservas: React.Dispatch<React.SetStateAction<boolean>>;
+  detalle: string;
+  nombreCliente: string;
+}
