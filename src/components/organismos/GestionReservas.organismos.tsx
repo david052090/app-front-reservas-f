@@ -7,6 +7,7 @@ import { IDataReservas } from "../../interface/reservas.interface";
 import ModalEditarReserva from "../moleculas/ModalEditarReservas.moleculas";
 import dayjs, { Dayjs } from "dayjs";
 import { Box } from "@mui/material";
+import ModalDetalleReservas from "../moleculas/ModalDetalleReservas.moleculas";
 
 const GestionReservas = () => {
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
@@ -23,7 +24,10 @@ const GestionReservas = () => {
   const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(dayjs());
   const [reservasHoy, setReservasHoy] = useState<number>(0);
   const [reservasFuturas, setReservasFuturas] = useState<number>(0);
-
+  const [detalleReserva, setDetalleReserva] = useState<string>("");
+  const [nombreCliente, setNombreCliente] = useState<string>("");
+  const [abrirModalDetalleReservas, setAbrirModalDetalleReservas] =
+    useState<boolean>(false);
   useEffect(() => {
     getListarReservas();
   }, [filtroFecha, filtro]);
@@ -96,6 +100,9 @@ const GestionReservas = () => {
           selected={selected}
           setSelectedData={setSelectedData}
           selectedData={selectedData}
+          setDetalleReserva={setDetalleReserva}
+          setAbrirModalDetalleReservas={setAbrirModalDetalleReservas}
+          setNombreCliente={setNombreCliente}
         />
       </Box>
       <ModalRegistroReservas
@@ -110,6 +117,12 @@ const GestionReservas = () => {
         actualizarData={() => getListarReservas()}
         setSelected={setSelected}
         setSelectedData={setSelectedData}
+      />
+      <ModalDetalleReservas
+        abrirModalDetalleReservas={abrirModalDetalleReservas}
+        setAbrirModalDetalleReservas={setAbrirModalDetalleReservas}
+        detalle={detalleReserva}
+        nombreCliente={nombreCliente}
       />
     </>
   );
