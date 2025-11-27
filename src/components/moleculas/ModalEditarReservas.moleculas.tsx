@@ -32,8 +32,6 @@ const ModalEditarReserva = ({
   setAbrirModalEditar,
   reservaEditar,
   actualizarData,
-  setSelected,
-  setSelectedData,
 }: IModalEditarReserva) => {
   const { enqueueSnackbar } = useSnackbar();
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
@@ -94,8 +92,6 @@ const ModalEditarReserva = ({
       actualizarData();
       setAbrirModalEditar(false);
       reset();
-      setSelected([]);
-      setSelectedData([]);
     } catch (error) {
       console.error(error);
       enqueueSnackbar("Error al actualizar la reserva", {
@@ -127,8 +123,6 @@ const ModalEditarReserva = ({
   const cancelar = () => {
     setAbrirModalEditar(false);
     reset();
-    setSelected([]);
-    setSelectedData([]);
   };
   return (
     <Modal

@@ -18,63 +18,26 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
-import Checkbox from "@mui/material/Checkbox";
 import EditIcon from "@mui/icons-material/Edit";
-//import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import dayjs from "dayjs";
-
 const TablaReservas = ({
   dataListadoReservas,
   cargando,
   setAbrirModalEditar,
   setReservaEditar,
-  setSelected,
-  selected,
-  setSelectedData,
-  selectedData,
   setDetalleReserva,
   setAbrirModalDetalleReservas,
   setNombreCliente,
+  setAbrirModalEliminarReservas,
+  setEliminarReservas,
 }: IListadoReservas) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);
-  console.log("selectedData", selectedData);
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const allIds = dataListadoReservas.map((r) => r.id);
-      setSelected(allIds);
-      setSelectedData(dataListadoReservas);
-    } else {
-      setSelected([]);
-      setSelectedData([]);
-    }
-  };
-
-  const handleClick = (
-    _event: React.ChangeEvent<HTMLInputElement>,
-    id: number,
-    row: (typeof dataListadoReservas)[0]
-  ) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: number[] = [...selected];
-    let newSelectedData = [...selectedData];
-
-    if (selectedIndex === -1) {
-      newSelected.push(id);
-      newSelectedData.push(row);
-    } else {
-      newSelected.splice(selectedIndex, 1);
-      newSelectedData = newSelectedData.filter((item) => item.id !== id);
-    }
-
-    setSelected(newSelected);
-    setSelectedData(newSelectedData);
-  };
-
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -91,11 +54,6 @@ const TablaReservas = ({
     page * rowsPerPage + rowsPerPage
   );
 
-  const allSelected =
-    dataListadoReservas.length > 0 &&
-    selected.length === dataListadoReservas.length;
-  const isIndeterminate = selected.length > 0 && !allSelected;
-
   const mostrarColor = (row: IDataReservas) => {
     const isToday = dayjs(row.fecha).isSame(dayjs(), "day");
     const isFuture = dayjs(row.fecha).isAfter(dayjs(), "day");
@@ -111,6 +69,7 @@ const TablaReservas = ({
       return "transparent";
     }
   };
+
   return (
     <Paper
       sx={{ width: { xs: "250px", md: "100%" }, my: 3, overflowX: "auto" }}
@@ -122,43 +81,8 @@ const TablaReservas = ({
         }}
       >
         <Table aria-labelledby="tableTitle collapsible table" stickyHeader>
-          {selected.length > 0 && (
-            <TableHead>
-              <TableRow>
-                <TableCell colSpan={10} align="left">
-                  {selected.length === 1 && (
-                    <EditIcon
-                      sx={{ cursor: "pointer", color: "#1976d2" }}
-                      onClick={() => {
-                        setReservaEditar(selectedData[0]);
-                        setAbrirModalEditar(true);
-                        console.log("Click");
-                      }}
-                    />
-                  )}
-                  {/**{selected.length > 0 && (
-                    <DeleteIcon
-                      sx={{ cursor: "pointer", color: "#1976d2" }}
-                      onClick={() => {
-                        // Acción al hacer clic en el icono de editar
-                        console.log("Editar múltiples:", selectedData);
-                      }}
-                    />
-                  )} */}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-          )}
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
-                <Checkbox
-                  color="primary"
-                  indeterminate={isIndeterminate}
-                  checked={allSelected}
-                  onChange={handleSelectAllClick}
-                />
-              </TableCell>
               <TablaEncabezado encabezado={ENCABEZADO_TABLA_RESERVAS} />
             </TableRow>
           </TableHead>
@@ -183,10 +107,17 @@ const TablaReservas = ({
                     {visibleRows.map((row) => {
                       const estadoColor = mostrarColor(row);
                       return (
-                        <TableRow hover tabIndex={-1} key={row.id}>
+                        <TableRow
+                          hover
+                          tabIndex={-1}
+                          key={row.id}
+                          sx={{ position: "relative" }}
+                        >
                           <TableCell
-                            padding="checkbox"
-                            sx={{ position: "relative", pl: 0 }}
+                            component="th"
+                            scope="row"
+                            padding="none"
+                            align="left"
                           >
                             <Box
                               sx={{
@@ -198,27 +129,12 @@ const TablaReservas = ({
                                 bgcolor: estadoColor,
                               }}
                             />
-                            <Box sx={{ ml: "8px" }}>
-                              <Checkbox
-                                color="primary"
-                                checked={selected.includes(row.id)}
-                                onChange={(e) => handleClick(e, row.id, row)}
-                              />
-                            </Box>
-                          </TableCell>
-                          <TableCell
-                            component="th"
-                            scope="row"
-                            padding="none"
-                            align="left"
-                          >
                             <Typography
                               sx={{
                                 color: "rgba(8, 107, 181, 1)",
                                 fontWeight: 700,
                                 fontSize: "14px",
-                                width: "180px",
-                                paddingLeft: "16px",
+                                pl: 2,
                               }}
                             >
                               {row.nombre_cliente}
@@ -231,7 +147,7 @@ const TablaReservas = ({
                             {row.celular}
                           </TableCell>
                           <TableCell
-                            align="right"
+                            align="center"
                             sx={{ color: "rgba(0, 0, 0, 0.6)" }}
                           >
                             {row.cantidad_personas}
@@ -271,15 +187,6 @@ const TablaReservas = ({
                                   : "Click para ver observación"
                               }
                               arrow
-                              componentsProps={{
-                                tooltip: {
-                                  sx: {
-                                    maxWidth: 250, // ancho fijo del tooltip
-                                    whiteSpace: "pre-wrap", // permite saltos de línea y wrap
-                                    wordBreak: "break-word", // divide palabras largas
-                                  },
-                                },
-                              }}
                             >
                               <span>
                                 <IconButton
@@ -306,6 +213,34 @@ const TablaReservas = ({
                             {row.estado_reserva === 1
                               ? "Confirmada"
                               : "Cancelada"}
+                          </TableCell>
+                          <TableCell align="center">
+                            <Box sx={{ display: "flex" }}>
+                              <IconButton
+                                sx={{ color: "#1976d2" }}
+                                onClick={() => {
+                                  setReservaEditar(row);
+                                  setAbrirModalEditar(true);
+                                }}
+                              >
+                                <EditIcon />
+                              </IconButton>
+
+                              <IconButton
+                                sx={{ color: "#d32f2f" }}
+                                onClick={() => {
+                                  setEliminarReservas({
+                                    id: row.id,
+                                    nombreCliente: row.nombre_cliente,
+                                  });
+                                  setNombreCliente(row.nombre_cliente);
+                                  setAbrirModalEliminarReservas(true);
+                                }}
+                                disabled
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </Box>
                           </TableCell>
                         </TableRow>
                       );

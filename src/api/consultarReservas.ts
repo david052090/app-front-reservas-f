@@ -51,3 +51,16 @@ export async function actualizarReserva(data: FormValues & { id: number }) {
 
   return response.data;
 }
+
+export async function eliminarReserva(id: number) {
+  const token = localStorage.getItem("authToken");
+  const url = `${GESTIONAR_RESERVAS}/reservas/${id}`;
+
+  const response = await axios.delete(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+}
