@@ -17,13 +17,11 @@ export interface IListadoReservas {
   cargando: boolean;
   setAbrirModalEditar: React.Dispatch<React.SetStateAction<boolean>>;
   setReservaEditar: React.Dispatch<React.SetStateAction<IDataReservas | null>>;
-  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
-  selected: number[];
-  setSelectedData: React.Dispatch<React.SetStateAction<IDataReservas[]>>;
-  selectedData: IDataReservas[];
   setDetalleReserva: React.Dispatch<React.SetStateAction<string>>;
   setAbrirModalDetalleReservas: React.Dispatch<React.SetStateAction<boolean>>;
   setNombreCliente: React.Dispatch<React.SetStateAction<string>>;
+  setAbrirModalEliminarReservas: React.Dispatch<React.SetStateAction<boolean>>;
+  setEliminarReservas: React.Dispatch<React.SetStateAction<IEliminarReserva>>;
 }
 export interface IConsultarReservas {
   fecha?: string;
@@ -41,4 +39,17 @@ export interface IEncabezadoReservas {
   reservasHoy?: number;
   reservasFuturas?: number;
   mostrarContadores?: boolean;
+}
+
+export interface IEliminarReserva {
+  id: number;
+  nombreCliente?: string;
+}
+
+export interface IModalAdvertencia {
+  abrirModalEliminarReservas: boolean;
+  setAbrirModalEliminarReservas: React.Dispatch<React.SetStateAction<boolean>>;
+  nombreCliente?: string;
+  onEliminar: () => void;
+  loadingBtnEliminar: boolean;
 }
