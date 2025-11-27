@@ -3,13 +3,19 @@ import EncabezadoReservas from "../moleculas/EncabezadoReservas.moleculas";
 import { useEffect, useState } from "react";
 import { gestionarListadoReservas } from "../../api/consultarReservas.ts";
 import ModalRegistroReservas from "../moleculas/ModalRegistroReservas.moleculas";
-import { IDataReservas } from "../../interface/reservas.interface";
+import {
+  IDataReservas,
+  IEliminarReserva,
+} from "../../interface/reservas.interface";
 import ModalEditarReserva from "../moleculas/ModalEditarReservas.moleculas";
 import dayjs, { Dayjs } from "dayjs";
 import { Box } from "@mui/material";
 import ModalDetalleReservas from "../moleculas/ModalDetalleReservas.moleculas";
-
+import ModalAdvertencia from "../moleculas/ModalAdvertencia.moleculas";
+import { eliminarReserva } from "../../api/consultarReservas.ts";
+import { useSnackbar } from "notistack";
 const GestionReservas = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
   const [dataFiltrada, setDataFiltrada] = useState<IDataReservas[]>([]);
   const [abrirModalReservas, setAbrirModalReservas] = useState<boolean>(false);
@@ -18,8 +24,6 @@ const GestionReservas = () => {
   const [reservaEditar, setReservaEditar] = useState<IDataReservas | null>(
     null
   );
-  const [selected, setSelected] = useState<number[]>([]);
-  const [selectedData, setSelectedData] = useState<IDataReservas[]>([]);
   const [filtro, setFiltro] = useState("");
   const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(dayjs());
   const [reservasHoy, setReservasHoy] = useState<number>(0);
@@ -28,6 +32,14 @@ const GestionReservas = () => {
   const [nombreCliente, setNombreCliente] = useState<string>("");
   const [abrirModalDetalleReservas, setAbrirModalDetalleReservas] =
     useState<boolean>(false);
+  const [abrirModalEliminarReservas, setAbrirModalEliminarReservas] =
+    useState<boolean>(false);
+  const [eliminarReservas, setEliminarReservas] = useState<IEliminarReserva>({
+    id: 0,
+    nombreCliente: "",
+  });
+  const [loadingBtnEliminar, setLoadingBtnEliminar] = useState<boolean>(false);
+
   useEffect(() => {
     getListarReservas();
   }, [filtroFecha, filtro]);
@@ -68,6 +80,20 @@ const GestionReservas = () => {
     setReservasHoy(hoyConfirmadas.length);
     setReservasFuturas(futurasConfirmadas.length);
   };
+
+  const deleteReserva = async (id: number) => {
+    try {
+      setLoadingBtnEliminar(true);
+      await eliminarReserva(id);
+      setAbrirModalEliminarReservas(false);
+      enqueueSnackbar("Reserva eliminada con éxito", { variant: "success" });
+      getListarReservas();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingBtnEliminar(false);
+    }
+  };
   return (
     <>
       <Box
@@ -96,13 +122,11 @@ const GestionReservas = () => {
           cargando={cargando}
           setAbrirModalEditar={setAbrirModalEditar}
           setReservaEditar={setReservaEditar}
-          setSelected={setSelected}
-          selected={selected}
-          setSelectedData={setSelectedData}
-          selectedData={selectedData}
           setDetalleReserva={setDetalleReserva}
           setAbrirModalDetalleReservas={setAbrirModalDetalleReservas}
           setNombreCliente={setNombreCliente}
+          setAbrirModalEliminarReservas={setAbrirModalEliminarReservas}
+          setEliminarReservas={setEliminarReservas}
         />
       </Box>
       <ModalRegistroReservas
@@ -115,14 +139,19 @@ const GestionReservas = () => {
         setAbrirModalEditar={setAbrirModalEditar}
         reservaEditar={reservaEditar}
         actualizarData={() => getListarReservas()}
-        setSelected={setSelected}
-        setSelectedData={setSelectedData}
       />
       <ModalDetalleReservas
         abrirModalDetalleReservas={abrirModalDetalleReservas}
         setAbrirModalDetalleReservas={setAbrirModalDetalleReservas}
         detalle={detalleReserva}
         nombreCliente={nombreCliente}
+      />
+      <ModalAdvertencia
+        abrirModalEliminarReservas={abrirModalEliminarReservas}
+        setAbrirModalEliminarReservas={setAbrirModalEliminarReservas}
+        nombreCliente={eliminarReservas.nombreCliente}
+        onEliminar={() => deleteReserva(eliminarReservas.id)}
+        loadingBtnEliminar={loadingBtnEliminar}
       />
     </>
   );

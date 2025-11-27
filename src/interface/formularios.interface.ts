@@ -57,6 +57,4 @@ export interface IModalEditarReserva {
   setAbrirModalEditar: React.Dispatch<React.SetStateAction<boolean>>;
   reservaEditar: IDataReservas | null;
   actualizarData: () => void;
-  setSelected: React.Dispatch<React.SetStateAction<number[]>>;
-  setSelectedData: React.Dispatch<React.SetStateAction<IDataReservas[]>>;
 }
