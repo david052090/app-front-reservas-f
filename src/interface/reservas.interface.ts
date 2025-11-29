@@ -11,6 +11,9 @@ export interface IDataReservas {
   estado_reserva: number;
   observacion: string;
   ubicacion: string;
+  usuario_nombre: string;
+  usuario_email: string;
+  created_at: string;
 }
 export interface IListadoReservas {
   dataListadoReservas: IDataReservas[];
@@ -22,6 +25,10 @@ export interface IListadoReservas {
   setNombreCliente: React.Dispatch<React.SetStateAction<string>>;
   setAbrirModalEliminarReservas: React.Dispatch<React.SetStateAction<boolean>>;
   setEliminarReservas: React.Dispatch<React.SetStateAction<IEliminarReserva>>;
+  setAbrirModalDetalleUsuarios: React.Dispatch<React.SetStateAction<boolean>>;
+  setUsuarioDetalle?: React.Dispatch<
+    React.SetStateAction<IDataReservas | null>
+  >;
 }
 export interface IConsultarReservas {
   fecha?: string;
@@ -39,6 +46,7 @@ export interface IEncabezadoReservas {
   reservasHoy?: number;
   reservasFuturas?: number;
   mostrarContadores?: boolean;
+  textoBtn?: string;
 }
 
 export interface IEliminarReserva {
@@ -52,4 +60,14 @@ export interface IModalAdvertencia {
   nombreCliente?: string;
   onEliminar: () => void;
   loadingBtnEliminar: boolean;
+}
+export interface IDataModalDetalleUsuarios {
+  usuario_nombre: string;
+  usuario_email: string;
+  created_at: string;
+}
+export interface IModalDetalleUsuarios {
+  abrirModalDetalleUsuarios: boolean;
+  setAbrirModalDetalleUsuarios: React.Dispatch<React.SetStateAction<boolean>>;
+  dataModalDetalleUsuarios: IDataModalDetalleUsuarios;
 }

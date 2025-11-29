@@ -1,30 +1,37 @@
 // src/components/atomos/LoggedOutOnlyRoute.tsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { setAuthFromStorage } from "../../store/authSlice";
-import { esTokenValido } from "../../utils/esTokenValido";
 import { Box, CircularProgress } from "@mui/material";
+import { obtenerUsuarioActual } from "../../api/autenticacionUsuarios";
+import { useAuthStore } from "../../store/useAuthStore";
 
-type Props = { children: React.ReactNode };
-
-export const LoggedOutOnlyRoute: React.FC<Props> = ({ children }) => {
-  const dispatch = useDispatch();
-  const isAuthenticated = useSelector((s: RootState) => s.auth.isAuthenticated);
+export const LoggedOutOnlyRoute = ({ children }: { children: ReactNode }) => {
+  const { user, setUser, clearUser } = useAuthStore();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      setChecking(false);
-      return;
-    }
-    const token = localStorage.getItem("authToken");
-    if (token && esTokenValido(token)) {
-      dispatch(setAuthFromStorage(token));
-    }
-    setChecking(false);
-  }, [dispatch, isAuthenticated]);
+    let isMounted = true;
+
+    const validarSesion = async () => {
+      try {
+        const usuario = await obtenerUsuarioActual();
+        if (!isMounted) return;
+        setUser(usuario); // si hay sesión → redirigimos abajo
+      } catch (err) {
+        if (!isMounted) return;
+        clearUser(); // no hay sesión → permitir login
+      } finally {
+        if (!isMounted) return;
+        setChecking(false);
+      }
+    };
+
+    validarSesion();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [setUser, clearUser]);
 
   if (checking) {
     return (
@@ -39,10 +46,9 @@ export const LoggedOutOnlyRoute: React.FC<Props> = ({ children }) => {
     );
   }
 
-  // Si ya está autenticado, fuera del login
-  if (isAuthenticated) {
+  if (user) {
     return <Navigate to="/reservas" replace />;
   }
 
-  return <>{children}</>;
+  return children;
 };

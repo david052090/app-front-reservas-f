@@ -5,14 +5,11 @@ import { EstadisticaMensual } from "../interface/general";
 export async function obtenerEstadisticasMensuales(): Promise<
   EstadisticaMensual[]
 > {
-  const token = localStorage.getItem("authToken");
-  const url = GESTIONAR_RESERVAS + `/estadisticas-reservas`;
+  const url = `${GESTIONAR_RESERVAS}/estadisticas-reservas`;
 
   return axios
     .get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      withCredentials: true, // 🔥 Necesario para enviar la cookie
     })
     .then(({ data }) => data)
     .catch((err) => {

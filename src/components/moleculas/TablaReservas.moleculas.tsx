@@ -25,6 +25,8 @@ import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
 import dayjs from "dayjs";
+import { useAuthStore } from "../../store/useAuthStore";
+import { permisosSuperUsuario } from "../../utils/permisosUsuarios";
 const TablaReservas = ({
   dataListadoReservas,
   cargando,
@@ -35,9 +37,15 @@ const TablaReservas = ({
   setNombreCliente,
   setAbrirModalEliminarReservas,
   setEliminarReservas,
+  setAbrirModalDetalleUsuarios,
+  setUsuarioDetalle,
 }: IListadoReservas) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(50);
+  const user = useAuthStore((state) => state.user);
+
+  const permisos = permisosSuperUsuario(user);
+
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -135,6 +143,11 @@ const TablaReservas = ({
                                 fontWeight: 700,
                                 fontSize: "14px",
                                 pl: 2,
+                                cursor: "pointer",
+                              }}
+                              onClick={() => {
+                                setUsuarioDetalle(row);
+                                setAbrirModalDetalleUsuarios(true);
                               }}
                             >
                               {row.nombre_cliente}
@@ -222,6 +235,7 @@ const TablaReservas = ({
                                   setReservaEditar(row);
                                   setAbrirModalEditar(true);
                                 }}
+                                disabled={!permisos}
                               >
                                 <EditIcon />
                               </IconButton>
@@ -236,7 +250,7 @@ const TablaReservas = ({
                                   setNombreCliente(row.nombre_cliente);
                                   setAbrirModalEliminarReservas(true);
                                 }}
-                                disabled
+                                disabled={!permisos}
                               >
                                 <DeleteIcon />
                               </IconButton>

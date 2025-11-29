@@ -5,6 +5,7 @@ import ModalRegistrarTipoReservas from "../moleculas/ModalRegistrarTipoReservas.
 import { obtenerTiposReserva } from "../../api/consultarTipoReservas.ts";
 import { IListaTiposReservas } from "../../interface/tiposReservas.interface";
 import { Box } from "@mui/material";
+import Typography from "@mui/material/Typography";
 const GestionRegistroTipoReservas = () => {
   const [abrirModalTipoReservas, setAbrirModalTipoReservas] =
     useState<boolean>(false);
@@ -33,16 +34,24 @@ const GestionRegistroTipoReservas = () => {
     <>
       <Box
         sx={{
-          width: { xs: "auto", md: "700px" },
+          width: { xs: "auto", md: "800px" },
           maxWidth: { xs: "100vw", md: "none" },
           mx: 0,
           px: 0,
         }}
       >
-        <EncabezadoReservas
-          setAbrirModalReservas={setAbrirModalTipoReservas}
-          actualizarTabla={() => listarDataTipoReservas()}
-        />
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ width: "31%" }}>
+            <Typography sx={{ fontSize: "20px", fontWeight: 700 }}>
+              Tipos de reservas
+            </Typography>
+          </Box>
+          <EncabezadoReservas
+            setAbrirModalReservas={setAbrirModalTipoReservas}
+            actualizarTabla={() => listarDataTipoReservas()}
+          />
+        </Box>
+
         <TablaGestionarTiposReservas
           dataListadoTiposReservas={listarTipoReservas}
           cargando={cargando}

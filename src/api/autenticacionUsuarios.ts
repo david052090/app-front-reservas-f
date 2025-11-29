@@ -4,6 +4,7 @@ import { GESTIONAR_RESERVAS } from "../Env";
 import { IRegistroUsuario, ILoginUsuario } from "../interface/general";
 import { encriptarDatos } from "../utils/encriptarLogin";
 
+// REGISTRAR USUARIO
 export async function registrarUsuario({
   nombre,
   nombre_restaurante,
@@ -11,7 +12,7 @@ export async function registrarUsuario({
   email,
   password,
 }: IRegistroUsuario) {
-  const url = GESTIONAR_RESERVAS + `/register`;
+  const url = `${GESTIONAR_RESERVAS}/register`;
 
   const payloadEncriptado = encriptarDatos({
     nombre,
@@ -22,9 +23,11 @@ export async function registrarUsuario({
   });
 
   return axios
-    .post(url, {
-      payload: payloadEncriptado,
-    })
+    .post(
+      url,
+      { payload: payloadEncriptado },
+      { withCredentials: false } // ⬅️ CORREGIDO
+    )
     .then(({ data }) => data)
     .catch((err) => {
       console.error("Error al registrar usuario:", err);
@@ -33,22 +36,38 @@ export async function registrarUsuario({
 }
 
 // LOGIN USUARIO
-export async function loginUsuario({ nombre, password }: ILoginUsuario) {
-  const url = GESTIONAR_RESERVAS + `/login`;
-  const payloadEncriptado = encriptarDatos({ nombre, password });
+export async function loginUsuario({ email, password }: ILoginUsuario) {
+  const url = `${GESTIONAR_RESERVAS}/login`;
+  const payloadEncriptado = encriptarDatos({ email, password });
+
   return axios
-    .post(url, {
-      payload: payloadEncriptado,
-    })
-    .then(({ data }) => {
-      // Guardar token en localStorage
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
+    .post(
+      url,
+      { payload: payloadEncriptado },
+      {
+        withCredentials: true, // 🔥 Envía y recibe la cookie httpOnly
       }
-      return data;
-    })
+    )
+    .then(({ data }) => data) // { user: {...} }
     .catch((err) => {
       console.error("Error al iniciar sesión:", err);
       throw err;
     });
+}
+
+export async function obtenerUsuarioActual() {
+  const { data } = await axios.get(`${GESTIONAR_RESERVAS}/recargarDatos`, {
+    withCredentials: true,
+  });
+  return data.user;
+}
+
+export async function logoutUsuario() {
+  return axios.post(
+    `${GESTIONAR_RESERVAS}/logout`,
+    {},
+    {
+      withCredentials: true,
+    }
+  );
 }
