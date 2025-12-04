@@ -1,16 +1,14 @@
-import { StrictMode } from "react";
+import React from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { store } from "./store/store";
-import App from "./App.tsx";
+import App from "./App";
 import SnackbarAtom from "./components/atomos/snackbar.atomos";
-import { Provider } from "react-redux";
+import axios from "axios";
+axios.defaults.withCredentials = true;
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+  <React.StrictMode>
     <SnackbarAtom>
-      <Provider store={store}>
-        <App />
-      </Provider>
+      <App />
     </SnackbarAtom>
-  </StrictMode>
+  </React.StrictMode>
 );

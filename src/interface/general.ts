@@ -46,7 +46,7 @@ export interface IRegistroUsuario {
   password: string;
 }
 export interface ILoginUsuario {
-  nombre: string;
+  email: string;
   password: string;
 }
 export interface IModal {
@@ -69,4 +69,26 @@ export interface IModal {
   ocultarIconoX?: boolean;
   borderBottom?: string;
   paddingDialogActions?: string;
+}
+
+export interface IUserAuth {
+  id: number;
+  nombre: string;
+  email: string;
+  id_restaurante: number;
+  rol: number; // id_rol en la BD
+  es_propietario: boolean; // viene como TINYINT(1) pero se parsea como boolean
+  nombre_restaurante: string;
+}
+
+export interface IRol {
+  id: number;
+  nombre_rol: string;
+}
+
+export interface ICrearUsuarioHijo {
+  nombre: string;
+  email: string;
+  password: string;
+  id_rol: number; // Ej. 2 = admin, 3 = mesero, etc
 }

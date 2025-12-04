@@ -1,22 +1,14 @@
-import axios from "axios";
-import { GESTIONAR_RESERVAS } from "../Env";
+import { axiosInstance } from "./axiosInstance";
 import { EstadisticaMensual } from "../interface/general";
 
 export async function obtenerEstadisticasMensuales(): Promise<
   EstadisticaMensual[]
 > {
-  const token = localStorage.getItem("authToken");
-  const url = GESTIONAR_RESERVAS + `/estadisticas-reservas`;
-
-  return axios
-    .get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then(({ data }) => data)
-    .catch((err) => {
-      console.error("Error al obtener estadísticas:", err);
-      throw err;
-    });
+  try {
+    const { data } = await axiosInstance.get("/estadisticas-reservas");
+    return data;
+  } catch (err) {
+    console.error("Error al obtener estadísticas:", err);
+    throw err;
+  }
 }

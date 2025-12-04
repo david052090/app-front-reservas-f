@@ -1,5 +1,4 @@
 import * as React from "react";
-import { jwtDecode } from "jwt-decode";
 import { styled, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Box from "@mui/material/Box";
@@ -20,28 +19,22 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
 import AddHomeOutlinedIcon from "@mui/icons-material/AddHomeOutlined";
 import BentoOutlinedIcon from "@mui/icons-material/BentoOutlined";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/store"; // ajusta ruta
-import { logout, setAuthFromStorage } from "../../../store/authSlice"; // ajusta ruta
-import {
-  esTokenValido,
-  handleStorageAuth,
-  handleVisibilityAuth,
-} from "../../../utils/esTokenValido"; // ajusta ruta
-import { CircularProgress } from "@mui/material";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../../store/useAuthStore";
+import { logoutUsuario } from "../../../api/autenticacionUsuarios.ts"; // ← ZUSTAND
+import { permisosSuperUsuario } from "../../../utils/permisosUsuarios";
+
 const drawerWidth = 240;
+
+/* --------------------------- Styled Components --------------------------- */
 
 const Main = styled("main", {
   shouldForwardProp: (prop) => prop !== "open" && prop !== "isMobile",
-})<{
-  open?: boolean;
-  isMobile: boolean;
-}>(({ theme, open, isMobile }) => ({
+})<{ open?: boolean; isMobile: boolean }>(({ theme, open, isMobile }) => ({
   flexGrow: 1,
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
@@ -62,11 +55,12 @@ const Main = styled("main", {
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
+  isMobile: boolean;
 }
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open" && prop !== "isMobile",
-})<AppBarProps & { isMobile: boolean }>(({ theme, open, isMobile }) => ({
+})<AppBarProps>(({ theme, open, isMobile }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -90,84 +84,51 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
+/* --------------------------- Componente Principal --------------------------- */
+
 export default function PersistentDrawer({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // <-- Detectamos si es pantalla pequeña
-  const [open, setOpen] = React.useState(!isMobile);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { isAuthenticated, token } = useSelector((s: RootState) => s.auth);
-  const [checking, setChecking] = useState(true);
-  useEffect(() => {
-    setOpen(!isMobile); // <-- Sincronizamos estado open con isMobile
+  /* --------------------------- Estado del Drawer --------------------------- */
+  const [open, setOpen] = React.useState(!isMobile);
+
+  React.useEffect(() => {
+    setOpen(!isMobile);
   }, [isMobile]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      setChecking(false);
-      return;
-    }
-    const stored = localStorage.getItem("authToken");
-    if (stored && esTokenValido(stored)) {
-      dispatch(setAuthFromStorage(stored));
-    }
-    setChecking(false);
-  }, [dispatch, isAuthenticated]);
+  /* --------------------------- Zustand: Usuario --------------------------- */
+  const user = useAuthStore((s) => s.user);
+  const permisos = permisosSuperUsuario(user);
+  const clearUser = useAuthStore((s) => s.clearUser);
 
-  const userName = useMemo(() => {
-    if (!token) return "Dashboard";
+  /* --------------------------- Acciones --------------------------- */
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
+
+  const handleLogout = async () => {
+    clearUser(); // limpiamos Zustand
+
     try {
-      const decoded: any = jwtDecode(token);
-      return decoded?.nombre_restaurante || "Dashboard";
-    } catch {
-      return "Dashboard";
+      await logoutUsuario(); // backend borra cookie
+    } catch (e) {
+      console.error("Error en logout backend:", e);
     }
-  }, [token]);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+    navigate("/login", { replace: true });
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
-  };
+  /* --------------------------- Render --------------------------- */
 
-  useEffect(() => {
-    const listener = handleStorageAuth(dispatch, navigate, location);
-    window.addEventListener("storage", listener);
-    return () => window.removeEventListener("storage", listener);
-  }, [dispatch, navigate, location]);
-
-  useEffect(() => {
-    const listener = handleVisibilityAuth(dispatch, navigate, location);
-    document.addEventListener("visibilitychange", listener);
-    return () => document.removeEventListener("visibilitychange", listener);
-  }, [dispatch, navigate, location]);
-
-  if (checking) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
+
       <AppBar position="fixed" open={open} isMobile={isMobile}>
         <Toolbar>
           <IconButton
@@ -175,35 +136,36 @@ export default function PersistentDrawer({
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={{
-              mr: 2,
-              ...(open && { display: "none" }),
-            }}
+            sx={{ mr: 2, ...(open && { display: "none" }) }}
           >
             <MenuIcon />
           </IconButton>
+
           <Typography variant="h6" noWrap component="div">
-            {userName}
+            {user?.nombre_restaurante ?? "Dashboard"}
           </Typography>
+
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton color="inherit" onClick={handleLogout} edge="end">
+          <Typography variant="h6" noWrap component="div">
+            {user?.nombre}
+          </Typography>
+          <IconButton color="inherit" onClick={handleLogout}>
             <LogoutIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
+
+      {/* --------------------------- Drawer --------------------------- */}
       <Drawer
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-          },
+          "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
         }}
         variant={isMobile ? "temporary" : "persistent"}
         anchor="left"
         open={open}
-        onClose={handleDrawerClose} // <-- Necesario para temporary en móvil
+        onClose={handleDrawerClose}
         ModalProps={{ keepMounted: true }}
       >
         <DrawerHeader>
@@ -216,7 +178,10 @@ export default function PersistentDrawer({
             )}
           </IconButton>
         </DrawerHeader>
+
         <Divider />
+
+        {/* Menu Items */}
         <List>
           <ListItem disablePadding>
             <ListItemButton
@@ -230,8 +195,7 @@ export default function PersistentDrawer({
               <ListItemText primary="Reservas" />
             </ListItemButton>
           </ListItem>
-        </List>
-        <List>
+
           <ListItem disablePadding>
             <ListItemButton
               component={RouterLink}
@@ -244,8 +208,7 @@ export default function PersistentDrawer({
               <ListItemText primary="Ambientes" />
             </ListItemButton>
           </ListItem>
-        </List>
-        <List>
+
           <ListItem disablePadding>
             <ListItemButton
               component={RouterLink}
@@ -258,8 +221,7 @@ export default function PersistentDrawer({
               <ListItemText primary="Tipo de Reservas" />
             </ListItemButton>
           </ListItem>
-        </List>
-        <List>
+
           <ListItem disablePadding>
             <ListItemButton
               component={RouterLink}
@@ -269,13 +231,27 @@ export default function PersistentDrawer({
               <ListItemIcon>
                 <BarChartIcon />
               </ListItemIcon>
-              <ListItemText primary="Estadisticas" />
+              <ListItemText primary="Estadísticas" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              component={RouterLink}
+              to="/usuarios"
+              selected={location.pathname === "/usuarios"}
+              disabled={!permisos}
+            >
+              <ListItemIcon>
+                <GroupAddIcon />
+              </ListItemIcon>
+              <ListItemText primary="Usuarios" />
             </ListItemButton>
           </ListItem>
         </List>
       </Drawer>
+
       <Main open={open} isMobile={isMobile}>
-        <Box sx={{ ...theme.mixins.toolbar }} />
+        <Box sx={theme.mixins.toolbar} />
         {children}
       </Main>
     </Box>

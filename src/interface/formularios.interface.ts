@@ -9,7 +9,7 @@ export interface FormInputsRegistrar {
 }
 
 export interface LoginInputs {
-  nombre: string;
+  email: string;
   password: string;
 }
 
