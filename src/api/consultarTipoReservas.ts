@@ -1,17 +1,9 @@
-import axios from "axios";
-import { GESTIONAR_RESERVAS } from "../Env";
+import { axiosInstance } from "./axiosInstance";
 
+// 📌 Registrar un tipo de reserva
 export async function registrarTipoReserva(nombre_tipo_reserva: string) {
-  const url = `${GESTIONAR_RESERVAS}/tipo-reservas`;
-
-  return axios
-    .post(
-      url,
-      { nombre_tipo_reserva },
-      {
-        withCredentials: true, // 🔥 Reemplaza al header Authorization
-      }
-    )
+  return axiosInstance
+    .post("/tipo-reservas", { nombre_tipo_reserva })
     .then(({ data }) => data)
     .catch((err) => {
       console.error("Error al registrar tipo de reserva:", err);
@@ -19,13 +11,10 @@ export async function registrarTipoReserva(nombre_tipo_reserva: string) {
     });
 }
 
+// 📌 Obtener todos los tipos de reserva
 export async function obtenerTiposReserva() {
-  const url = `${GESTIONAR_RESERVAS}/tipo-reservas`;
-
-  return axios
-    .get(url, {
-      withCredentials: true, // 🔥 Necesario para enviar la cookie al backend
-    })
+  return axiosInstance
+    .get("/tipo-reservas")
     .then(({ data }) => data)
     .catch((err) => {
       console.error("Error al obtener tipos de reserva:", err);

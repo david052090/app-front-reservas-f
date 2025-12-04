@@ -1,17 +1,8 @@
-import axios from "axios";
-import { GESTIONAR_RESERVAS } from "../Env";
+import { axiosInstance } from "./axiosInstance";
 
 export async function registrarAmbiente(nombre_ambiente: string) {
-  const url = `${GESTIONAR_RESERVAS}/ambientes`;
-
-  return axios
-    .post(
-      url,
-      { nombre_ambiente },
-      {
-        withCredentials: true, // 🔥 Importante
-      }
-    )
+  return axiosInstance
+    .post("/ambientes", { nombre_ambiente })
     .then(({ data }) => data)
     .catch((err) => {
       console.error("Error al crear ambiente:", err);
@@ -20,12 +11,8 @@ export async function registrarAmbiente(nombre_ambiente: string) {
 }
 
 export async function obtenerAmbientes() {
-  const url = `${GESTIONAR_RESERVAS}/ambientes`;
-
-  return axios
-    .get(url, {
-      withCredentials: true, // 🔥 Importante
-    })
+  return axiosInstance
+    .get("/ambientes")
     .then(({ data }) => data)
     .catch((err) => {
       console.error("Error al obtener ambientes:", err);

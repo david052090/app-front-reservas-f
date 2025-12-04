@@ -26,8 +26,8 @@ export interface IListadoReservas {
   setAbrirModalEliminarReservas: React.Dispatch<React.SetStateAction<boolean>>;
   setEliminarReservas: React.Dispatch<React.SetStateAction<IEliminarReserva>>;
   setAbrirModalDetalleUsuarios: React.Dispatch<React.SetStateAction<boolean>>;
-  setUsuarioDetalle?: React.Dispatch<
-    React.SetStateAction<IDataReservas | null>
+  setUsuarioDetalle: React.Dispatch<
+    React.SetStateAction<IDataModalDetalleUsuarios | null>
   >;
 }
 export interface IConsultarReservas {
@@ -69,5 +69,5 @@ export interface IDataModalDetalleUsuarios {
 export interface IModalDetalleUsuarios {
   abrirModalDetalleUsuarios: boolean;
   setAbrirModalDetalleUsuarios: React.Dispatch<React.SetStateAction<boolean>>;
-  dataModalDetalleUsuarios: IDataModalDetalleUsuarios;
+  dataModalDetalleUsuarios: IDataModalDetalleUsuarios | null;
 }

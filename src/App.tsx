@@ -13,14 +13,9 @@ import { ProtegerRutas } from "./components/atomos/ProtegerRutas.atomos";
 import { LoggedOutOnlyRoute } from "./components/atomos/LoggedOutOnlyRoute";
 import RegistroUsuario from "./components/moleculas/usuarios/RegistroUsuario";
 import ConfigUsuariosHijos from "./page/ConfigUsuariosHijos";
-import { useAuthStore } from "./store/useAuthStore";
-import { permisosSuperUsuario } from "./utils/permisosUsuarios";
 import { RutaConPermiso } from "./components/atomos/RutaConPermiso";
 
 const App: React.FC = () => {
-  const user = useAuthStore((s) => s.user);
-  const permisos = permisosSuperUsuario(user);
-
   return (
     <BrowserRouter>
       <Routes>

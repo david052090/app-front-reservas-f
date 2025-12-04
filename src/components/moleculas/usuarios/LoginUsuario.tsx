@@ -25,9 +25,8 @@ export const LoginUsuario = () => {
       setServerError(null);
 
       const response = await loginUsuario(data);
-
       // Guardamos usuario en Zustand (la cookie ya está creada en backend)
-      setUser(response.user);
+      setUser(response.data.user);
 
       navigate("/reservas");
     } catch (err: any) {

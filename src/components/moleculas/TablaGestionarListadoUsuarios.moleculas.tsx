@@ -1,8 +1,5 @@
 import TablaEncabezado from "./TablaEncabezado.moleculas";
-import {
-  ENCABEZADO_TABLA_GESTIONAR_AMBIENTES,
-  ENCABEZADO_TABLA_GESTIONAR_USUARIOS,
-} from "../../constants/global.constants";
+import { ENCABEZADO_TABLA_GESTIONAR_USUARIOS } from "../../constants/global.constants";
 import formatearFecha from "../../utils/formatearFecha";
 import {
   Paper,
@@ -15,7 +12,6 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { IListadoGestionUsuarios } from "../../interface/usuarios.interface";
-import { ROLES_USUARIOS } from "../../constants/global.constants";
 
 const TablaGestionarListadoUsuarios = ({
   dataListadoUsuarios,

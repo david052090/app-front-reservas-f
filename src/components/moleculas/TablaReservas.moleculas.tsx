@@ -146,7 +146,7 @@ const TablaReservas = ({
                                 cursor: "pointer",
                               }}
                               onClick={() => {
-                                setUsuarioDetalle(row);
+                                setUsuarioDetalle?.(row);
                                 setAbrirModalDetalleUsuarios(true);
                               }}
                             >

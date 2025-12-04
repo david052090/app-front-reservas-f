@@ -1,15 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Paper,
-  TextField,
-  Typography,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-} from "@mui/material";
+import { Box, TextField, MenuItem } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import {
   crearUsuarioHijoApi,
@@ -28,12 +18,10 @@ const ModalCrearUsuarioHijo = ({
 }: IModalCrearUsuarioHijo) => {
   const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<IRol[]>([]);
-  const [loadingRoles, setLoadingRoles] = useState<boolean>(true);
 
   const {
     register,
     handleSubmit,
-    setValue,
     control,
     reset,
     formState: { errors, isValid },
@@ -48,13 +36,10 @@ const ModalCrearUsuarioHijo = ({
 
   const obtenerRolesUsuarios = async () => {
     try {
-      setLoadingRoles(true);
       const data = await obtenerRolesHijoApi();
       setRoles(data);
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoadingRoles(false);
     }
   };
 
@@ -131,8 +116,8 @@ const ModalCrearUsuarioHijo = ({
               select
               label="Rol usuario"
               fullWidth
-              error={!!errors.rol}
-              helperText={errors.rol?.message}
+              error={!!errors.id_rol}
+              helperText={errors.id_rol?.message}
             >
               {roles.map((rol) => (
                 <MenuItem key={rol.id} value={rol.id}>
@@ -142,13 +127,6 @@ const ModalCrearUsuarioHijo = ({
             </TextField>
           )}
         />
-        {/**<Button
-            type="submit"
-            variant="contained"
-            disabled={isSubmitting || loadingRoles}
-          >
-            {isSubmitting ? "Creando..." : "Crear Usuario"}
-          </Button> */}
       </Box>
     </Modal>
   );

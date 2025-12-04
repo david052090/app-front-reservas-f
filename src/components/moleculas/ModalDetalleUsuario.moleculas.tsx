@@ -1,7 +1,5 @@
 import Modal from "./Modal.moleculas";
 import { Typography, Box } from "@mui/material";
-import { renderDetalle } from "../../utils/renderDetalle";
-import { IModalDetalleReservas } from "../../interface/tiposReservas.interface";
 import { IModalDetalleUsuarios } from "../../interface/reservas.interface";
 import formatearFecha from "../../utils/formatearFecha";
 
@@ -46,7 +44,7 @@ const ModalDetalleUsuario = ({
             Fecha registro:
           </Typography>
           <Typography sx={{ whiteSpace: "pre-line", fontSize: "14px" }}>
-            {formatearFecha(dataModalDetalleUsuarios?.created_at, false)}
+            {formatearFecha(dataModalDetalleUsuarios?.created_at ?? "", false)}
           </Typography>
         </Box>
       </Box>

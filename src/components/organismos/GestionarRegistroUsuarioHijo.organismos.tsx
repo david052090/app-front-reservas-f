@@ -1,5 +1,4 @@
 import EncabezadoReservas from "../moleculas/EncabezadoReservas.moleculas";
-import ModalRegistrarAmbiente from "../moleculas/ModalRegistrarAmbiente.moleculas";
 import { useState, useEffect } from "react";
 import { Box } from "@mui/material";
 import ModalCrearUsuarioHijo from "../moleculas/usuarios/CrearUsuariosHijos";
