@@ -72,6 +72,7 @@ const GestionarRegistroUsuarioHijo = () => {
       <ModalCrearUsuarioHijo
         abrirModalUsuarioHijo={abrirModalUsuarioHijo}
         setAbrirModalUsuarioHijo={setAbrirModalUsuarioHijo}
+        recargarDataUsuarios={() => listarGestionUsuarios()}
       />
     </>
   );
