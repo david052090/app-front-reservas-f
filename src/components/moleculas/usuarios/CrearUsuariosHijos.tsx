@@ -11,13 +11,16 @@ import Modal from "../Modal.moleculas";
 interface IModalCrearUsuarioHijo {
   abrirModalUsuarioHijo: boolean;
   setAbrirModalUsuarioHijo: React.Dispatch<React.SetStateAction<boolean>>;
+  recargarDataUsuarios: () => void;
 }
 const ModalCrearUsuarioHijo = ({
   abrirModalUsuarioHijo,
   setAbrirModalUsuarioHijo,
+  recargarDataUsuarios,
 }: IModalCrearUsuarioHijo) => {
   const { enqueueSnackbar } = useSnackbar();
   const [roles, setRoles] = useState<IRol[]>([]);
+  const [loadingBtn, setLoadingBtn] = useState<boolean>(false);
 
   const {
     register,
@@ -45,12 +48,18 @@ const ModalCrearUsuarioHijo = ({
 
   const onSubmit = async (data: ICrearUsuarioHijo) => {
     try {
+      setLoadingBtn(true);
       await crearUsuarioHijoApi(data);
       enqueueSnackbar("Usuario creado con éxito", { variant: "success" });
+      setAbrirModalUsuarioHijo(false);
+      reset();
+      recargarDataUsuarios();
     } catch (err: any) {
       enqueueSnackbar(err.response?.data?.error || "Error creando usuario", {
         variant: "error",
       });
+    } finally {
+      setLoadingBtn(false);
     }
   };
 
@@ -68,6 +77,7 @@ const ModalCrearUsuarioHijo = ({
       mostrarBtnCancelar
       mostrarBtnGuardar
       disabledBtnGuardar={!isValid}
+      loadingBtnGuardar={loadingBtn}
     >
       <Box
         display="flex"
