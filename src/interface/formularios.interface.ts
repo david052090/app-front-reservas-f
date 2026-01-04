@@ -40,6 +40,10 @@ export interface IModalRegistroReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
   abrirModalReservas: boolean;
   actualizarData: () => void;
+  setAbrirModalModalErrorAdvertencia: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+  setTextErrorResponse: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export interface IModalRegistroAmbiente {

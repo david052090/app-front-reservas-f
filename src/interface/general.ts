@@ -76,7 +76,7 @@ export interface IUserAuth {
   nombre: string;
   email: string;
   id_restaurante: number;
-  rol: number; // id_rol en la BD
+  id_rol: number; // id_rol en la BD
   es_propietario: boolean; // viene como TINYINT(1) pero se parsea como boolean
   nombre_restaurante: string;
 }
@@ -90,5 +90,14 @@ export interface ICrearUsuarioHijo {
   nombre: string;
   email: string;
   password: string;
-  id_rol: number; // Ej. 2 = admin, 3 = mesero, etc
+  id_rol: number;
+}
+
+export interface IModalErrorAdvertencia {
+  abrirModalModalErrorAdvertencia: boolean;
+  setAbrirModalModalErrorAdvertencia: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+  titulo: string;
+  textBody: string;
 }
