@@ -1,11 +1,13 @@
 import { axiosInstance } from "./axiosInstance";
 import { EstadisticaMensual } from "../interface/general";
 
-export async function obtenerEstadisticasMensuales(): Promise<
-  EstadisticaMensual[]
-> {
+export async function obtenerEstadisticasMensuales(
+  anio?: number
+): Promise<EstadisticaMensual[]> {
   try {
-    const { data } = await axiosInstance.get("/estadisticas-reservas");
+    const { data } = await axiosInstance.get("/estadisticas-reservas", {
+      params: anio ? { anio } : undefined,
+    });
     return data;
   } catch (err) {
     console.error("Error al obtener estadísticas:", err);
