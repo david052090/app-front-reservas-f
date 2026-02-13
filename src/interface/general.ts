@@ -77,7 +77,7 @@ export interface IUserAuth {
   email: string;
   id_restaurante: number;
   id_rol: number; // id_rol en la BD
-  es_propietario: boolean; // viene como TINYINT(1) pero se parsea como boolean
+  es_propietario: number; // viene como TINYINT(1) pero se parsea como boolean
   nombre_restaurante: string;
 }
 

@@ -26,7 +26,7 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { logoutUsuario } from "../../../api/autenticacionUsuarios.ts"; // ← ZUSTAND
-import { permisosSuperUsuario } from "../../../utils/permisosUsuarios";
+import { permisosRestaurante } from "../../../utils/permisosUsuarios";
 
 const drawerWidth = 240;
 
@@ -104,7 +104,7 @@ export default function PersistentDrawer({
 
   /* --------------------------- Zustand: Usuario --------------------------- */
   const user = useAuthStore((s) => s.user);
-  const permisos = permisosSuperUsuario(user);
+  const accesosRestaurante = permisosRestaurante(user);
   const clearUser = useAuthStore((s) => s.clearUser);
 
   /* --------------------------- Acciones --------------------------- */
@@ -239,7 +239,7 @@ export default function PersistentDrawer({
               component={RouterLink}
               to="/usuarios"
               selected={location.pathname === "/usuarios"}
-              disabled={!permisos}
+              disabled={!accesosRestaurante}
             >
               <ListItemIcon>
                 <GroupAddIcon />
