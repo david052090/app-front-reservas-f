@@ -3,7 +3,11 @@ import axios from "axios";
 import { GESTIONAR_RESERVAS } from "../Env";
 import { IRegistroUsuario, ILoginUsuario } from "../interface/general";
 import { encriptarDatos } from "../utils/encriptarLogin";
+import { axiosInstance } from "./axiosInstance";
 
+// ----------------------------------------------------------
+// REGISTRAR USUARIO
+// ----------------------------------------------------------
 export async function registrarUsuario({
   nombre,
   nombre_restaurante,
@@ -11,7 +15,7 @@ export async function registrarUsuario({
   email,
   password,
 }: IRegistroUsuario) {
-  const url = GESTIONAR_RESERVAS + `/register`;
+  const url = `${GESTIONAR_RESERVAS}/register`;
 
   const payloadEncriptado = encriptarDatos({
     nombre,
@@ -22,9 +26,11 @@ export async function registrarUsuario({
   });
 
   return axios
-    .post(url, {
-      payload: payloadEncriptado,
-    })
+    .post(
+      url,
+      { payload: payloadEncriptado },
+      { withCredentials: false } // no necesita cookies
+    )
     .then(({ data }) => data)
     .catch((err) => {
       console.error("Error al registrar usuario:", err);
@@ -32,23 +38,43 @@ export async function registrarUsuario({
     });
 }
 
+// ----------------------------------------------------------
 // LOGIN USUARIO
-export async function loginUsuario({ nombre, password }: ILoginUsuario) {
-  const url = GESTIONAR_RESERVAS + `/login`;
-  const payloadEncriptado = encriptarDatos({ nombre, password });
-  return axios
-    .post(url, {
-      payload: payloadEncriptado,
-    })
-    .then(({ data }) => {
-      // Guardar token en localStorage
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
-      }
-      return data;
-    })
-    .catch((err) => {
-      console.error("Error al iniciar sesión:", err);
-      throw err;
-    });
+// ----------------------------------------------------------
+export async function loginUsuario({ email, password }: ILoginUsuario) {
+  const payload = encriptarDatos({ email, password });
+
+  // 🔥 Debe usar axios normal porque aún NO existe cookie
+  return axiosInstance.post("/login", { payload });
+}
+
+// ----------------------------------------------------------
+// OBTENER USUARIO ACTUAL (usa refresh automático por interceptor)
+// ----------------------------------------------------------
+export async function obtenerUsuarioActual() {
+  const { data } = await axiosInstance.get("/recargarDatos");
+  return data.user;
+}
+
+// ----------------------------------------------------------
+// LOGOUT
+// ----------------------------------------------------------
+export async function logoutUsuario() {
+  return axiosInstance.post("/logout");
+}
+
+// ----------------------------------------------------------
+// REFRESH TOKEN (usado por interceptor)
+// ----------------------------------------------------------
+export async function refreshToken() {
+  try {
+    await axiosInstance.post("/refresh");
+
+    // 🔥 Necesario para que el navegador aplique la cookie nueva
+    await new Promise((res) => setTimeout(res, 50));
+
+    return true;
+  } catch {
+    return false;
+  }
 }

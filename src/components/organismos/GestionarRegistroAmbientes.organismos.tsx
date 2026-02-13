@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { IListaAmbientes } from "../../interface/ambientes.interface";
 import { getListaAmbientes } from "../../utils/obtenerAmbientes";
 import { Box } from "@mui/material";
+import Typography from "@mui/material/Typography";
 const GestionarRegistroAmbientes = () => {
   const [abrirModalAmbiente, setAbrirModalAmbiente] = useState<boolean>(false);
   const [listarDataAmbientes, setListarDataAmbientes] = useState<
@@ -31,16 +32,24 @@ const GestionarRegistroAmbientes = () => {
     <>
       <Box
         sx={{
-          width: { xs: "auto", md: "700px" },
+          width: { xs: "auto", md: "800px" },
           maxWidth: { xs: "100vw", md: "none" },
           mx: 0,
           px: 0,
         }}
       >
-        <EncabezadoReservas
-          setAbrirModalReservas={setAbrirModalAmbiente}
-          actualizarTabla={() => listarAmbientes()}
-        />
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ width: "37%" }}>
+            <Typography sx={{ fontSize: "20px", fontWeight: 700 }}>
+              Gestión de ambientes
+            </Typography>
+          </Box>
+          <EncabezadoReservas
+            setAbrirModalReservas={setAbrirModalAmbiente}
+            actualizarTabla={() => listarAmbientes()}
+          />
+        </Box>
+
         <TablaGestionarRegistroAmbientes
           dataListadoAmbientes={listarDataAmbientes}
           cargando={cargando}

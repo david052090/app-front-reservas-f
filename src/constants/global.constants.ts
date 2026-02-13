@@ -106,3 +106,47 @@ export const UBICACIONES = [
   { value: "segundo piso", label: "Segundo piso" },
   { value: "terraza", label: "Terraza" },
 ];
+
+export const ENCABEZADO_TABLA_GESTIONAR_USUARIOS: Array<ITablaEncabezado> = [
+  {
+    id: "nombre",
+    label: "Nombre",
+    align: "left",
+    width: "20%",
+    iconoOrdenar: true,
+  },
+  {
+    id: "correo",
+    label: "Correo",
+    align: "right",
+    width: "20%",
+    iconoOrdenar: true,
+  },
+  {
+    id: "id_rol",
+    label: "Rol usuario",
+    align: "center",
+    width: "20%",
+    iconoOrdenar: true,
+  },
+  {
+    id: "es_propietario",
+    label: "Administrador",
+    align: "center",
+    width: "20%",
+    iconoOrdenar: true,
+  },
+  {
+    id: "fecha",
+    label: "Fecha",
+    align: "right",
+    width: "20%",
+    iconoOrdenar: true,
+  },
+];
+
+export const ROLES_USUARIOS = {
+  propietario: 1,
+  admin: 2,
+  mesero: 3,
+};

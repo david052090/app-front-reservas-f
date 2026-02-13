@@ -16,6 +16,8 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Tooltip from "@mui/material/Tooltip";
 import CalendarIcon from "@mui/icons-material/CalendarMonth";
 import { IEncabezadoReservas } from "../../interface/reservas.interface";
+import { useAuthStore } from "../../store/useAuthStore";
+import { permisosSuperUsuario } from "../../utils/permisosUsuarios";
 
 export default function EncabezadoReservas({
   setAbrirModalReservas,
@@ -29,9 +31,13 @@ export default function EncabezadoReservas({
   reservasHoy,
   reservasFuturas,
   mostrarContadores,
+  textoBtn,
 }: IEncabezadoReservas) {
   const [valorBuscador, setValorBuscador] = useState<string>(filtro ?? "");
   const [openCalendar, setOpenCalendar] = useState<boolean>(false);
+  const user = useAuthStore((state) => state.user);
+  const permisos = permisosSuperUsuario(user);
+
   const handleClear = () => {
     setValorBuscador("");
     setFiltro?.("");
@@ -223,10 +229,11 @@ export default function EncabezadoReservas({
           <ReplayIcon />
         </IconButton>
         <BotonRedondo
-          texto={"Nueva"}
+          texto={textoBtn ?? "Nueva"}
           icono={<AddIcon />}
           width={{ xs: "100%", sm: "auto" }}
           onClick={() => setAbrirModalReservas(true)}
+          disabled={!permisos}
         />
       </Box>
     </Box>

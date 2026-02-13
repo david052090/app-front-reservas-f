@@ -1,35 +1,26 @@
 import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
 import ReservasPage from "./page/Reservas";
 import PersistentDrawer from "./components/moleculas/menuDrawer/PersistentDrawer";
 import { LoginUsuario } from "./components/moleculas/usuarios/LoginUsuario";
-//import RegistroUsuario from "./components/moleculas/usuarios/RegistroUsuario";
-import { ProtectedRoute } from "./components/atomos/ProtegerRutas.atomos";
 import ConfigAmbientes from "./page/ConfigAmbientes";
 import ConfigTipoReservas from "./page/ConfigTipoReservas";
 import Estadisticas from "./page/Estadisticas";
-import { useDispatch } from "react-redux";
-import { setAuthFromStorage } from "./store/authSlice.ts";
-import { esTokenValido } from "./utils/esTokenValido";
-import { useEffect } from "react";
+
+import { ProtegerRutas } from "./components/atomos/ProtegerRutas.atomos";
 import { LoggedOutOnlyRoute } from "./components/atomos/LoggedOutOnlyRoute";
+import RegistroUsuario from "./components/moleculas/usuarios/RegistroUsuario";
+import ConfigUsuariosHijos from "./page/ConfigUsuariosHijos";
+import { RutaConPermiso } from "./components/atomos/RutaConPermiso";
 
 const App: React.FC = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token && esTokenValido(token)) {
-      dispatch(setAuthFromStorage(token));
-    }
-  }, [dispatch]);
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
-        {/**<Route path="/register" element={<RegistroUsuario />} /> */}
-        <Route path="/register" element={<Navigate to="/login" replace />} />
+
         <Route
           path="/login"
           element={
@@ -38,44 +29,69 @@ const App: React.FC = () => {
             </LoggedOutOnlyRoute>
           }
         />
+
+        <Route
+          path="/register"
+          element={
+            <LoggedOutOnlyRoute>
+              <RegistroUsuario />
+            </LoggedOutOnlyRoute>
+          }
+        />
+
         <Route
           path="/reservas"
           element={
-            <ProtectedRoute>
+            <ProtegerRutas>
               <PersistentDrawer>
                 <ReservasPage />
               </PersistentDrawer>
-            </ProtectedRoute>
+            </ProtegerRutas>
           }
         />
+
         <Route
           path="/ambientes"
           element={
-            <ProtectedRoute>
+            <ProtegerRutas>
               <PersistentDrawer>
                 <ConfigAmbientes />
               </PersistentDrawer>
-            </ProtectedRoute>
+            </ProtegerRutas>
           }
         />
+
         <Route
           path="/tipos-reservas"
           element={
-            <ProtectedRoute>
+            <ProtegerRutas>
               <PersistentDrawer>
                 <ConfigTipoReservas />
               </PersistentDrawer>
-            </ProtectedRoute>
+            </ProtegerRutas>
           }
         />
+
         <Route
           path="/estadisticas"
           element={
-            <ProtectedRoute>
+            <ProtegerRutas>
               <PersistentDrawer>
                 <Estadisticas />
               </PersistentDrawer>
-            </ProtectedRoute>
+            </ProtegerRutas>
+          }
+        />
+        <Route
+          path={"/usuarios"}
+          element={
+            <ProtegerRutas>
+              <RutaConPermiso>
+                <PersistentDrawer>
+                  <ConfigUsuariosHijos />
+                </PersistentDrawer>
+              </RutaConPermiso>
+            </ProtegerRutas>
           }
         />
       </Routes>

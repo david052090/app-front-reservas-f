@@ -1,36 +1,38 @@
-// src/components/atomos/ProtectedRoute.tsx
-import React, { useEffect, useState } from "react";
+// src/components/atomos/ProtegerRutas.atomos.tsx
+import { useEffect, useState, ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { setAuthFromStorage } from "../../store/authSlice";
-import { esTokenValido } from "../../utils/esTokenValido";
 import { Box, CircularProgress } from "@mui/material";
+import { obtenerUsuarioActual } from "../../api/autenticacionUsuarios";
+import { useAuthStore } from "../../store/useAuthStore";
 
-type Props = { children: React.ReactNode };
-
-export const ProtectedRoute: React.FC<Props> = ({ children }) => {
+export const ProtegerRutas = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
-  const dispatch = useDispatch();
-  const isAuthenticated = useSelector((s: RootState) => s.auth.isAuthenticated);
-
+  const { user, setUser, clearUser } = useAuthStore();
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Si Redux dice que ya está autenticado, no hay que revisar nada
-    if (isAuthenticated) {
-      setChecking(false);
-      return;
-    }
-    // Fallback: validar token persistido
-    const token = localStorage.getItem("authToken");
-    if (token && esTokenValido(token)) {
-      dispatch(setAuthFromStorage(token));
-      setChecking(false);
-    } else {
-      setChecking(false);
-    }
-  }, [dispatch, isAuthenticated]);
+    let isMounted = true;
+
+    const validarSesion = async () => {
+      try {
+        const usuario = await obtenerUsuarioActual();
+        if (!isMounted) return;
+        setUser(usuario);
+      } catch (error) {
+        if (!isMounted) return;
+        clearUser();
+      } finally {
+        if (!isMounted) return;
+        setChecking(false);
+      }
+    };
+
+    validarSesion();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [setUser, clearUser]);
 
   if (checking) {
     return (
@@ -45,10 +47,9 @@ export const ProtectedRoute: React.FC<Props> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    // Guardamos a dónde iba para volver después del login
+  if (!user) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  return <>{children}</>;
+  return children;
 };

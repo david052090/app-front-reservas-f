@@ -14,6 +14,9 @@ import ModalDetalleReservas from "../moleculas/ModalDetalleReservas.moleculas";
 import ModalAdvertencia from "../moleculas/ModalAdvertencia.moleculas";
 import { eliminarReserva } from "../../api/consultarReservas.ts";
 import { useSnackbar } from "notistack";
+import ModalDetalleUsuario from "../moleculas/ModalDetalleUsuario.moleculas";
+import { IDataModalDetalleUsuarios } from "../../interface/reservas.interface";
+import ModalErrorAdvertencia from "../moleculas/ModalErrorAdvertencia.moleculas";
 const GestionReservas = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
@@ -39,6 +42,13 @@ const GestionReservas = () => {
     nombreCliente: "",
   });
   const [loadingBtnEliminar, setLoadingBtnEliminar] = useState<boolean>(false);
+  const [usuarioDetalle, setUsuarioDetalle] =
+    useState<IDataModalDetalleUsuarios | null>(null);
+  const [abrirModalDetalleUsuarios, setAbrirModalDetalleUsuarios] =
+    useState(false);
+  const [abrirModalModalErrorAdvertencia, setAbrirModalModalErrorAdvertencia] =
+    useState<boolean>(false);
+  const [textErrorResponse, setTextErrorResponse] = useState<string>("");
 
   useEffect(() => {
     getListarReservas();
@@ -127,12 +137,16 @@ const GestionReservas = () => {
           setNombreCliente={setNombreCliente}
           setAbrirModalEliminarReservas={setAbrirModalEliminarReservas}
           setEliminarReservas={setEliminarReservas}
+          setAbrirModalDetalleUsuarios={setAbrirModalDetalleUsuarios}
+          setUsuarioDetalle={setUsuarioDetalle}
         />
       </Box>
       <ModalRegistroReservas
         setAbrirModalReservas={setAbrirModalReservas}
         abrirModalReservas={abrirModalReservas}
         actualizarData={() => getListarReservas()}
+        setAbrirModalModalErrorAdvertencia={setAbrirModalModalErrorAdvertencia}
+        setTextErrorResponse={setTextErrorResponse}
       />
       <ModalEditarReserva
         abrirModalEditar={abrirModalEditar}
@@ -152,6 +166,17 @@ const GestionReservas = () => {
         nombreCliente={eliminarReservas.nombreCliente}
         onEliminar={() => deleteReserva(eliminarReservas.id)}
         loadingBtnEliminar={loadingBtnEliminar}
+      />
+      <ModalDetalleUsuario
+        abrirModalDetalleUsuarios={abrirModalDetalleUsuarios}
+        setAbrirModalDetalleUsuarios={setAbrirModalDetalleUsuarios}
+        dataModalDetalleUsuarios={usuarioDetalle}
+      />
+      <ModalErrorAdvertencia
+        abrirModalModalErrorAdvertencia={abrirModalModalErrorAdvertencia}
+        setAbrirModalModalErrorAdvertencia={setAbrirModalModalErrorAdvertencia}
+        titulo={"Advertencia"}
+        textBody={textErrorResponse}
       />
     </>
   );
