@@ -16,6 +16,7 @@ import { eliminarReserva } from "../../api/consultarReservas.ts";
 import { useSnackbar } from "notistack";
 import ModalDetalleUsuario from "../moleculas/ModalDetalleUsuario.moleculas";
 import { IDataModalDetalleUsuarios } from "../../interface/reservas.interface";
+import ModalErrorAdvertencia from "../moleculas/ModalErrorAdvertencia.moleculas";
 const GestionReservas = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
@@ -45,6 +46,9 @@ const GestionReservas = () => {
     useState<IDataModalDetalleUsuarios | null>(null);
   const [abrirModalDetalleUsuarios, setAbrirModalDetalleUsuarios] =
     useState(false);
+  const [abrirModalModalErrorAdvertencia, setAbrirModalModalErrorAdvertencia] =
+    useState<boolean>(false);
+  const [textErrorResponse, setTextErrorResponse] = useState<string>("");
 
   useEffect(() => {
     getListarReservas();
@@ -141,6 +145,8 @@ const GestionReservas = () => {
         setAbrirModalReservas={setAbrirModalReservas}
         abrirModalReservas={abrirModalReservas}
         actualizarData={() => getListarReservas()}
+        setAbrirModalModalErrorAdvertencia={setAbrirModalModalErrorAdvertencia}
+        setTextErrorResponse={setTextErrorResponse}
       />
       <ModalEditarReserva
         abrirModalEditar={abrirModalEditar}
@@ -165,6 +171,12 @@ const GestionReservas = () => {
         abrirModalDetalleUsuarios={abrirModalDetalleUsuarios}
         setAbrirModalDetalleUsuarios={setAbrirModalDetalleUsuarios}
         dataModalDetalleUsuarios={usuarioDetalle}
+      />
+      <ModalErrorAdvertencia
+        abrirModalModalErrorAdvertencia={abrirModalModalErrorAdvertencia}
+        setAbrirModalModalErrorAdvertencia={setAbrirModalModalErrorAdvertencia}
+        titulo={"Advertencia"}
+        textBody={textErrorResponse}
       />
     </>
   );

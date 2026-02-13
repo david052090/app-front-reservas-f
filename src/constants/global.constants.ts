@@ -146,6 +146,7 @@ export const ENCABEZADO_TABLA_GESTIONAR_USUARIOS: Array<ITablaEncabezado> = [
 ];
 
 export const ROLES_USUARIOS = {
-  admin: 1,
+  propietario: 1,
+  admin: 2,
   mesero: 3,
 };

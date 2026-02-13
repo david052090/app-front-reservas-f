@@ -24,6 +24,8 @@ const ModalRegistroReservas = ({
   setAbrirModalReservas,
   abrirModalReservas,
   actualizarData,
+  setAbrirModalModalErrorAdvertencia,
+  setTextErrorResponse,
 }: IModalRegistroReservas) => {
   const { enqueueSnackbar } = useSnackbar();
   const [cargandoBtn, setCargandoBtn] = useState<boolean>(false);
@@ -75,11 +77,16 @@ const ModalRegistroReservas = ({
       enqueueSnackbar("Reserva creada con exito.", {
         variant: "success",
       });
-    } catch (error) {
-      console.log("error", error);
-      enqueueSnackbar("Error de conexión, por favor intente más tarde.", {
-        variant: "warning",
-      });
+    } catch (error: any) {
+      console.log("error", error.response);
+      if (error.response.status === 409) {
+        setAbrirModalModalErrorAdvertencia(true);
+        setTextErrorResponse(error.response.data.error);
+      } else {
+        enqueueSnackbar("Error de conexión, por favor intente más tarde.", {
+          variant: "warning",
+        });
+      }
     } finally {
       setCargandoBtn(false);
     }
