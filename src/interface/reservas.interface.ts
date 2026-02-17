@@ -32,7 +32,9 @@ export interface IListadoReservas {
 }
 export interface IConsultarReservas {
   fecha?: string;
+  hora?: string;
   nombreCliente?: string;
+  ubicacion?: string;
 }
 export interface IEncabezadoReservas {
   setAbrirModalReservas: React.Dispatch<React.SetStateAction<boolean>>;
@@ -41,6 +43,11 @@ export interface IEncabezadoReservas {
   setFiltro?: React.Dispatch<React.SetStateAction<string>>;
   filtroFecha?: Dayjs | null;
   setFiltroFecha?: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+  filtroHora?: Dayjs | null;
+  setFiltroHora?: React.Dispatch<React.SetStateAction<Dayjs | null>>;
+  filtroUbicacion?: string;
+  setFiltroUbicacion?: React.Dispatch<React.SetStateAction<string>>;
+  listaUbicaciones?: string[];
   mostrarBuscador?: boolean;
   mostrarFecha?: boolean;
   reservasHoy?: number;
