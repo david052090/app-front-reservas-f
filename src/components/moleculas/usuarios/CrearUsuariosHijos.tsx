@@ -100,7 +100,13 @@ const ModalCrearUsuarioHijo = ({
         <TextField
           label="Correo"
           type="email"
-          {...register("email", { required: "Campo obligatorio" })}
+          {...register("email", {
+            required: "Campo obligatorio",
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Correo inválido",
+            },
+          })}
           error={!!errors.email}
           helperText={errors.email?.message}
         />

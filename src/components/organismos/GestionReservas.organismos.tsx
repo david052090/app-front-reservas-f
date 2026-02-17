@@ -17,6 +17,7 @@ import { useSnackbar } from "notistack";
 import ModalDetalleUsuario from "../moleculas/ModalDetalleUsuario.moleculas";
 import { IDataModalDetalleUsuarios } from "../../interface/reservas.interface";
 import ModalErrorAdvertencia from "../moleculas/ModalErrorAdvertencia.moleculas";
+import { getListaAmbientes } from "../../utils/obtenerAmbientes";
 const GestionReservas = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [listarReservas, setListarReservas] = useState<IDataReservas[]>([]);
@@ -29,6 +30,9 @@ const GestionReservas = () => {
   );
   const [filtro, setFiltro] = useState("");
   const [filtroFecha, setFiltroFecha] = useState<Dayjs | null>(dayjs());
+  const [filtroHora, setFiltroHora] = useState<Dayjs | null>(null);
+  const [filtroUbicacion, setFiltroUbicacion] = useState<string>("");
+  const [listaUbicaciones, setListaUbicaciones] = useState<string[]>([]);
   const [reservasHoy, setReservasHoy] = useState<number>(0);
   const [reservasFuturas, setReservasFuturas] = useState<number>(0);
   const [detalleReserva, setDetalleReserva] = useState<string>("");
@@ -51,17 +55,24 @@ const GestionReservas = () => {
   const [textErrorResponse, setTextErrorResponse] = useState<string>("");
 
   useEffect(() => {
+    listarUbicaciones();
+  }, []);
+
+  useEffect(() => {
     getListarReservas();
-  }, [filtroFecha, filtro]);
+  }, [filtroFecha, filtroHora, filtro, filtroUbicacion]);
 
   const getListarReservas = async () => {
     const fecha = filtroFecha ? dayjs(filtroFecha).format("YYYY-MM-DD") : "";
+    const hora = filtroHora ? dayjs(filtroHora).format("hh:mm A") : "";
     try {
       setCargando(true);
       //const userId = localStorage.getItem("userId");
       const dataListado = await gestionarListadoReservas({
         fecha,
+        hora,
         nombreCliente: filtro,
+        ubicacion: filtroUbicacion,
       });
       setListarReservas(dataListado.reservas);
     } catch (error) {
@@ -74,7 +85,18 @@ const GestionReservas = () => {
   useEffect(() => {
     setDataFiltrada(listarReservas);
     calcularCantidadReservas();
-  }, [listarReservas, filtroFecha, filtro]);
+  }, [listarReservas, filtroFecha, filtroHora, filtro, filtroUbicacion]);
+
+  const listarUbicaciones = async () => {
+    try {
+      const respuesta = await getListaAmbientes();
+      setListaUbicaciones(
+        respuesta.map((item: { nombre_ambiente: string }) => item.nombre_ambiente)
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const calcularCantidadReservas = () => {
     const hoy = dayjs();
@@ -121,6 +143,11 @@ const GestionReservas = () => {
           setFiltro={setFiltro}
           filtroFecha={filtroFecha}
           setFiltroFecha={setFiltroFecha}
+          filtroHora={filtroHora}
+          setFiltroHora={setFiltroHora}
+          filtroUbicacion={filtroUbicacion}
+          setFiltroUbicacion={setFiltroUbicacion}
+          listaUbicaciones={listaUbicaciones}
           mostrarBuscador
           mostrarFecha
           reservasHoy={reservasHoy}

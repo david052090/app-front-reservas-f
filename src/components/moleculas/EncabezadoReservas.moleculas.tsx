@@ -1,6 +1,6 @@
 // este encabezado, contiene el titulo, el buscador retraible, el filtro estado y el boton redondo
 // este componente se comporta como un encabezado base
-import { Box, Typography } from "@mui/material";
+import { Box, MenuItem, TextField } from "@mui/material";
 import BotonRedondo from "../atomos/BotonRedondo.atomos";
 import AddIcon from "@mui/icons-material/Add";
 import ReplayIcon from "@mui/icons-material/Replay";
@@ -8,16 +8,18 @@ import IconButton from "@mui/material/IconButton";
 import { InputBase } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import InputAdornment from "@mui/material/InputAdornment";
-import Tooltip from "@mui/material/Tooltip";
 import CalendarIcon from "@mui/icons-material/CalendarMonth";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { IEncabezadoReservas } from "../../interface/reservas.interface";
 import { useAuthStore } from "../../store/useAuthStore";
 import { permisosSuperUsuario } from "../../utils/permisosUsuarios";
+import Tooltip from "@mui/material/Tooltip";
 
 export default function EncabezadoReservas({
   setAbrirModalReservas,
@@ -26,6 +28,11 @@ export default function EncabezadoReservas({
   setFiltro,
   filtroFecha,
   setFiltroFecha,
+  filtroHora,
+  setFiltroHora,
+  filtroUbicacion,
+  setFiltroUbicacion,
+  listaUbicaciones,
   mostrarBuscador,
   mostrarFecha,
   reservasHoy,
@@ -35,8 +42,14 @@ export default function EncabezadoReservas({
 }: IEncabezadoReservas) {
   const [valorBuscador, setValorBuscador] = useState<string>(filtro ?? "");
   const [openCalendar, setOpenCalendar] = useState<boolean>(false);
+  const [openClock, setOpenClock] = useState<boolean>(false);
+  const [horaTemporal, setHoraTemporal] = useState(filtroHora ?? null);
   const user = useAuthStore((state) => state.user);
   const permisos = permisosSuperUsuario(user);
+
+  useEffect(() => {
+    setHoraTemporal(filtroHora ?? null);
+  }, [filtroHora]);
 
   const handleClear = () => {
     setValorBuscador("");
@@ -55,7 +68,7 @@ export default function EncabezadoReservas({
       sx={{
         width: { xs: "250px", md: "100%" },
         display: "flex",
-        flexWrap: "wrap",
+        flexWrap: { xs: "wrap", md: "nowrap" },
         flexDirection: { xs: "column", sm: "row" },
         justifyContent:
           !mostrarBuscador && !mostrarContadores && !mostrarFecha
@@ -76,7 +89,7 @@ export default function EncabezadoReservas({
             px: 1.5,
             height: 38,
             flex: { xs: 1, sm: "0 0 auto" },
-            minWidth: { xs: "100%", sm: 250 },
+            minWidth: { xs: "100%", sm: 210, md: 220 },
           }}
         >
           <SearchIcon sx={{ color: "#888", mr: 1 }} />
@@ -105,25 +118,28 @@ export default function EncabezadoReservas({
             order: { xs: 3, sm: 2 },
           }}
         >
-          <Typography sx={{ fontWeight: "bold" }}>Reservas:</Typography>
-          <Box
-            sx={{
-              backgroundColor: "#1976d2",
-              color: "white",
-              borderRadius: "50%",
-              width: 28,
-              height: 28,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold",
-              fontSize: 16,
-              cursor: "default",
-            }}
-          >
-            {(reservasHoy ?? 0) + (reservasFuturas ?? 0)}
-          </Box>
-          <Tooltip title="Reservas confirmadas para hoy" arrow>
+          {/** <Typography sx={{ fontWeight: "bold" }}>Reservas:</Typography> */}
+
+          <Tooltip title="Cantidad de reservas filtradas" arrow>
+            <Box
+              sx={{
+                backgroundColor: "#1976d2",
+                color: "white",
+                borderRadius: "50%",
+                width: 35,
+                height: 35,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: "bold",
+                fontSize: 16,
+                cursor: "default",
+              }}
+            >
+              {(reservasHoy ?? 0) + (reservasFuturas ?? 0)}
+            </Box>
+          </Tooltip>
+          {/** <Tooltip title="Reservas confirmadas para hoy" arrow>
             <Box
               sx={{
                 backgroundColor: "#4caf50",
@@ -134,9 +150,9 @@ export default function EncabezadoReservas({
                 cursor: "default",
               }}
             ></Box>
-          </Tooltip>
+          </Tooltip> */}
 
-          <Tooltip title="Reservas próximas confirmadas" arrow>
+          {/**<Tooltip title="Reservas próximas confirmadas" arrow>
             <Box
               sx={{
                 backgroundColor: "#ff9800",
@@ -147,14 +163,14 @@ export default function EncabezadoReservas({
                 cursor: "default",
               }}
             ></Box>
-          </Tooltip>
+          </Tooltip> */}
         </Box>
       )}
 
       <Box
         sx={{
           display: "flex",
-          flexWrap: "wrap",
+          flexWrap: { xs: "wrap", sm: "nowrap" },
           flexDirection: { xs: "column", sm: "row" },
           alignItems: "center",
           gap: { xs: 1, sm: 2 },
@@ -162,15 +178,15 @@ export default function EncabezadoReservas({
           width: { xs: "100%", sm: "auto" },
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            width: "200px",
-            alignItems: "center",
-          }}
-        >
-          {mostrarFecha && (
-            <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+        {mostrarFecha && (
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+            <Box
+              sx={{
+                display: "flex",
+                width: { xs: "100%", sm: "170px" },
+                alignItems: "center",
+              }}
+            >
               <DatePicker
                 label="Filtrar por fecha"
                 open={openCalendar}
@@ -184,13 +200,12 @@ export default function EncabezadoReservas({
                     sx: {
                       backgroundColor: "#f0f0f0",
                       borderRadius: "10px",
-                      width: { xs: "100%", sm: 180 },
+                      width: { xs: "100%", sm: 160 },
                       mr: { xs: 0 },
                     },
                     InputProps: {
                       endAdornment: (
                         <InputAdornment position="end" sx={{ gap: 1 }}>
-                          {/* Ícono nativo del Calendario */}
                           <IconButton
                             edge="end"
                             tabIndex={-1}
@@ -198,8 +213,6 @@ export default function EncabezadoReservas({
                           >
                             <CalendarIcon fontSize="small" />
                           </IconButton>
-
-                          {/* Ícono personalizado para limpiar la fecha */}
                           {filtroFecha && (
                             <IconButton
                               size="small"
@@ -215,19 +228,103 @@ export default function EncabezadoReservas({
                   },
                 }}
               />
-            </LocalizationProvider>
-          )}
-        </Box>
-        <IconButton
-          onClick={actualizarTabla}
-          sx={{
-            backgroundColor: "#f0f0f0",
-            display: { xs: "none", sm: "inline-flex" },
-            mr: { xs: 0, sm: "25px" },
-          }}
-        >
-          <ReplayIcon />
-        </IconButton>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                width: { xs: "100%", sm: "170px" },
+                alignItems: "center",
+              }}
+            >
+              <TimePicker
+                label="Filtrar por hora"
+                ampm
+                format="hh:mm A"
+                open={openClock}
+                onOpen={() => setOpenClock(true)}
+                onClose={() => setOpenClock(false)}
+                value={horaTemporal}
+                onChange={(nuevaHora) => setHoraTemporal(nuevaHora)}
+                onAccept={(nuevaHora) => {
+                  setFiltroHora?.(nuevaHora ?? null);
+                }}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    sx: {
+                      backgroundColor: "#f0f0f0",
+                      borderRadius: "10px",
+                      width: { xs: "100%", sm: 160 },
+                      mr: { xs: 0 },
+                    },
+                    InputProps: {
+                      endAdornment: (
+                        <InputAdornment position="end" sx={{ gap: 1 }}>
+                          <IconButton
+                            edge="end"
+                            tabIndex={-1}
+                            onClick={() => setOpenClock(true)}
+                          >
+                            <AccessTimeIcon fontSize="small" />
+                          </IconButton>
+                          {filtroHora && (
+                            <IconButton
+                              size="small"
+                              edge="end"
+                              onClick={() => setFiltroHora?.(null)}
+                            >
+                              <ClearIcon fontSize="small" />
+                            </IconButton>
+                          )}
+                        </InputAdornment>
+                      ),
+                    },
+                  },
+                }}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                width: { xs: "100%", sm: "170px" },
+                alignItems: "center",
+              }}
+            >
+              <TextField
+                select
+                label="Filtrar por Ambiente"
+                size="small"
+                value={filtroUbicacion ?? ""}
+                onChange={(e) => setFiltroUbicacion?.(e.target.value)}
+                sx={{
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "10px",
+                  width: { xs: "100%", sm: 160 },
+                }}
+              >
+                <MenuItem value="">Todas</MenuItem>
+                {(listaUbicaciones ?? []).map((ubicacion) => (
+                  <MenuItem key={ubicacion} value={ubicacion}>
+                    {ubicacion}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+          </LocalizationProvider>
+        )}
+        <Tooltip title="Actualizar" arrow>
+          <IconButton
+            onClick={actualizarTabla}
+            sx={{
+              backgroundColor: "#f0f0f0",
+              display: { xs: "none", sm: "inline-flex" },
+              mr: { xs: 0, sm: "25px" },
+            }}
+          >
+            <ReplayIcon />
+          </IconButton>
+        </Tooltip>
+
         <BotonRedondo
           texto={textoBtn ?? "Nueva"}
           icono={<AddIcon />}
