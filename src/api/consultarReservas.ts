@@ -4,11 +4,15 @@ import { IConsultarReservas } from "../interface/reservas.interface";
 
 export async function gestionarListadoReservas({
   fecha,
+  hora,
   nombreCliente,
+  ubicacion,
 }: IConsultarReservas) {
   const params = new URLSearchParams();
   if (fecha) params.append("fecha", fecha);
+  if (hora) params.append("hora", hora);
   if (nombreCliente) params.append("nombre_cliente", nombreCliente);
+  if (ubicacion) params.append("ubicacion", ubicacion);
 
   return axiosInstance
     .get(`/reservas?${params.toString()}`)
