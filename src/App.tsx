@@ -8,6 +8,7 @@ import { LoginUsuario } from "./components/moleculas/usuarios/LoginUsuario";
 import ConfigAmbientes from "./page/ConfigAmbientes";
 import ConfigTipoReservas from "./page/ConfigTipoReservas";
 import Estadisticas from "./page/Estadisticas";
+import MesasPage from "./page/Mesas";
 
 import { ProtegerRutas } from "./components/atomos/ProtegerRutas.atomos";
 import { LoggedOutOnlyRoute } from "./components/atomos/LoggedOutOnlyRoute";
@@ -78,6 +79,16 @@ const App: React.FC = () => {
             <ProtegerRutas>
               <PersistentDrawer>
                 <Estadisticas />
+              </PersistentDrawer>
+            </ProtegerRutas>
+          }
+        />
+        <Route
+          path="/mesas"
+          element={
+            <ProtegerRutas>
+              <PersistentDrawer>
+                <MesasPage />
               </PersistentDrawer>
             </ProtegerRutas>
           }

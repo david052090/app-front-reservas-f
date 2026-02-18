@@ -23,6 +23,7 @@ import AddHomeOutlinedIcon from "@mui/icons-material/AddHomeOutlined";
 import BentoOutlinedIcon from "@mui/icons-material/BentoOutlined";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import TableRestaurantIcon from "@mui/icons-material/TableRestaurant";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { logoutUsuario } from "../../../api/autenticacionUsuarios.ts"; // ← ZUSTAND
@@ -232,6 +233,18 @@ export default function PersistentDrawer({
                 <BarChartIcon />
               </ListItemIcon>
               <ListItemText primary="Estadísticas" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              component={RouterLink}
+              to="/mesas"
+              selected={location.pathname === "/mesas"}
+            >
+              <ListItemIcon>
+                <TableRestaurantIcon />
+              </ListItemIcon>
+              <ListItemText primary="Mesas" />
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
