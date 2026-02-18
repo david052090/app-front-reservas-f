@@ -9,6 +9,7 @@ import {
   Grid,
   IconButton,
   MenuItem,
+  Skeleton,
   Stack,
   TextField,
   Typography,
@@ -36,6 +37,15 @@ interface IPlatoBorrador {
   precio_unitario: number;
 }
 
+interface IPlatoEnEdicion {
+  id?: number;
+  nombre: string;
+  cantidad: number;
+  precio_unitario: number;
+  subtotal: number;
+  tempId: string;
+}
+
 const GestionMesas = () => {
   const { enqueueSnackbar } = useSnackbar();
 
@@ -52,9 +62,11 @@ const GestionMesas = () => {
   const [nombrePlato, setNombrePlato] = useState("");
   const [cantidadPlato, setCantidadPlato] = useState<number>(1);
   const [precioPlato, setPrecioPlato] = useState<number>(0);
+  const [platosEnEdicion, setPlatosEnEdicion] = useState<IPlatoEnEdicion[]>(
+    [],
+  );
 
   const [loadingGuardar, setLoadingGuardar] = useState(false);
-  const [loadingPlato, setLoadingPlato] = useState(false);
   const [abrirModalCrear, setAbrirModalCrear] = useState(false);
   const [loadingCrearMesa, setLoadingCrearMesa] = useState(false);
 
@@ -118,17 +130,19 @@ const GestionMesas = () => {
   };
 
   const totalPlatosMesa = useMemo(() => {
-    if (!mesaSeleccionada) return 0;
-    return mesaSeleccionada.platos.reduce(
-      (acc, plato) => acc + plato.cantidad,
-      0,
-    );
-  }, [mesaSeleccionada]);
+    return platosEnEdicion.reduce((acc, plato) => acc + plato.cantidad, 0);
+  }, [platosEnEdicion]);
 
   const abrirGestionMesa = (mesa: IMesa) => {
     setMesaSeleccionada(mesa);
     setReservaId(mesa.reserva?.id ? String(mesa.reserva.id) : "");
     setEstadoMesa(mesa.estado);
+    setPlatosEnEdicion(
+      mesa.platos.map((plato) => ({
+        ...plato,
+        tempId: `plato-${plato.id}`,
+      })),
+    );
     setAbrirModal(true);
   };
 
@@ -140,18 +154,44 @@ const GestionMesas = () => {
     setNombrePlato("");
     setCantidadPlato(1);
     setPrecioPlato(0);
+    setPlatosEnEdicion([]);
   };
 
   const guardarAsignacion = async () => {
     if (!mesaSeleccionada) return;
     try {
       setLoadingGuardar(true);
+      const idsActuales = new Set(
+        platosEnEdicion
+          .filter((plato) => plato.id !== undefined)
+          .map((plato) => plato.id as number),
+      );
+      const idsOriginales = mesaSeleccionada.platos.map((plato) => plato.id);
+      const platosAEliminar = idsOriginales.filter((id) => !idsActuales.has(id));
+      const platosANuevo = platosEnEdicion
+        .filter((plato) => plato.id === undefined)
+        .map((plato) => ({
+          nombre: plato.nombre,
+          cantidad: plato.cantidad,
+          precio_unitario: plato.precio_unitario,
+        }));
+
+      const operacionesPlatos = [
+        ...platosAEliminar.map((idPlatoMesa) =>
+          eliminarPlatoMesa(mesaSeleccionada.id, idPlatoMesa),
+        ),
+        ...platosANuevo.map((plato) =>
+          agregarPlatoMesa(mesaSeleccionada.id, plato),
+        ),
+      ];
+
       await Promise.all([
         asignarReservaMesa(
           mesaSeleccionada.id,
           reservaId ? Number(reservaId) : null,
         ),
         actualizarEstadoMesa(mesaSeleccionada.id, estadoMesa),
+        ...operacionesPlatos,
       ]);
       enqueueSnackbar("Mesa actualizada correctamente", { variant: "success" });
       const dataMesas = await cargarMesas();
@@ -172,8 +212,7 @@ const GestionMesas = () => {
     }
   };
 
-  const guardarPlato = async () => {
-    if (!mesaSeleccionada) return;
+  const guardarPlato = () => {
     if (!nombrePlato.trim()) {
       enqueueSnackbar("Debes ingresar el nombre del plato", {
         variant: "warning",
@@ -187,48 +226,23 @@ const GestionMesas = () => {
       return;
     }
 
-    try {
-      setLoadingPlato(true);
-      await agregarPlatoMesa(mesaSeleccionada.id, {
+    setPlatosEnEdicion((prev) => [
+      ...prev,
+      {
+        tempId: `nuevo-${Date.now()}-${prev.length}`,
         nombre: nombrePlato.trim(),
         cantidad: Number(cantidadPlato),
         precio_unitario: Number(precioPlato),
-      });
-      enqueueSnackbar("Plato agregado correctamente", { variant: "success" });
-      setNombrePlato("");
-      setCantidadPlato(1);
-      setPrecioPlato(0);
-      const dataMesas = await cargarMesas();
-      const mesaActualizada = dataMesas.find(
-        (mesa) => mesa.id === mesaSeleccionada.id,
-      );
-      if (mesaActualizada) {
-        setMesaSeleccionada(mesaActualizada);
-      }
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar("No se pudo agregar el plato", { variant: "error" });
-    } finally {
-      setLoadingPlato(false);
-    }
+        subtotal: Number(cantidadPlato) * Number(precioPlato),
+      },
+    ]);
+    setNombrePlato("");
+    setCantidadPlato(1);
+    setPrecioPlato(0);
   };
 
-  const borrarPlato = async (idPlatoMesa: number) => {
-    if (!mesaSeleccionada) return;
-    try {
-      await eliminarPlatoMesa(mesaSeleccionada.id, idPlatoMesa);
-      enqueueSnackbar("Plato eliminado", { variant: "success" });
-      const dataMesas = await cargarMesas();
-      const mesaActualizada = dataMesas.find(
-        (mesa) => mesa.id === mesaSeleccionada.id,
-      );
-      if (mesaActualizada) {
-        setMesaSeleccionada(mesaActualizada);
-      }
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar("No se pudo eliminar el plato", { variant: "error" });
-    }
+  const borrarPlato = (tempId: string) => {
+    setPlatosEnEdicion((prev) => prev.filter((plato) => plato.tempId !== tempId));
   };
 
   const mesasOrdenadas = useMemo(() => {
@@ -355,46 +369,67 @@ const GestionMesas = () => {
         </Stack>
 
         <Grid container spacing={2}>
-          {mesasOrdenadas.map((mesa) => (
-            <Grid key={mesa.id} size={{ xs: 12, md: 6, lg: 4 }}>
-              <Card>
-                <CardContent>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    sx={{ mb: 1 }}
-                  >
-                    <Typography variant="h6">
-                      Mesa #{mesa.numero} - {mesa.ubicacion}
-                    </Typography>
-                    <Chip
-                      size="small"
-                      label={
-                        mesa.estado === "ocupada" ? "Ocupada" : "Habilitada"
-                      }
-                      color={mesa.estado === "ocupada" ? "error" : "success"}
-                    />
-                  </Stack>
-                  <Typography variant="body2" color="text.secondary">
-                    Reserva: {mesa.reserva?.nombre_cliente ?? "Sin reserva"}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Platos: {mesa.platos?.length ?? 0}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Total: ${Number(mesa.total ?? 0).toFixed(2)}
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    sx={{ mt: 2 }}
-                    onClick={() => abrirGestionMesa(mesa)}
-                  >
-                    Gestionar
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+          {cargando
+            ? Array.from({ length: 6 }).map((_, index) => (
+                <Grid key={`skeleton-mesa-${index}`} size={{ xs: 12, md: 6, lg: 4 }}>
+                  <Card>
+                    <CardContent>
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        sx={{ mb: 1 }}
+                      >
+                        <Skeleton variant="text" width="70%" height={32} />
+                        <Skeleton variant="rounded" width={85} height={24} />
+                      </Stack>
+                      <Skeleton variant="text" width="80%" />
+                      <Skeleton variant="text" width="35%" />
+                      <Skeleton variant="text" width="45%" />
+                      <Skeleton variant="rounded" width={110} height={36} sx={{ mt: 2 }} />
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))
+            : mesasOrdenadas.map((mesa) => (
+                <Grid key={mesa.id} size={{ xs: 12, md: 6, lg: 4 }}>
+                  <Card>
+                    <CardContent>
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        sx={{ mb: 1 }}
+                      >
+                        <Typography variant="h6">
+                          Mesa #{mesa.numero} - {mesa.ubicacion}
+                        </Typography>
+                        <Chip
+                          size="small"
+                          label={
+                            mesa.estado === "ocupada" ? "Ocupada" : "Habilitada"
+                          }
+                          color={mesa.estado === "ocupada" ? "error" : "success"}
+                        />
+                      </Stack>
+                      <Typography variant="body2" color="text.secondary">
+                        Reserva: {mesa.reserva?.nombre_cliente ?? "Sin reserva"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Platos: {mesa.platos?.length ?? 0}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Total: ${Number(mesa.total ?? 0).toFixed(2)}
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                        onClick={() => abrirGestionMesa(mesa)}
+                      >
+                        Gestionar
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
         </Grid>
       </Box>
 
@@ -619,7 +654,7 @@ const GestionMesas = () => {
             <Button
               variant="contained"
               onClick={guardarPlato}
-              disabled={loadingPlato}
+              disabled={loadingGuardar}
               sx={{ minWidth: 130 }}
             >
               Agregar
@@ -631,10 +666,10 @@ const GestionMesas = () => {
           </Typography>
 
           <Stack spacing={1}>
-            {mesaSeleccionada?.platos?.length ? (
-              mesaSeleccionada.platos.map((plato) => (
+            {platosEnEdicion.length ? (
+              platosEnEdicion.map((plato) => (
                 <Stack
-                  key={plato.id}
+                  key={plato.tempId}
                   direction="row"
                   justifyContent="space-between"
                   alignItems="center"
@@ -649,10 +684,7 @@ const GestionMesas = () => {
                     {plato.nombre} x{plato.cantidad} - $
                     {plato.subtotal.toFixed(2)}
                   </Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => borrarPlato(plato.id)}
-                  >
+                  <IconButton size="small" onClick={() => borrarPlato(plato.tempId)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Stack>
