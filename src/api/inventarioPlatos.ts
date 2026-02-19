@@ -1,15 +1,14 @@
 import { axiosInstance } from "./axiosInstance";
-import { IListarInventarioResponse } from "../interface/inventario.interface";
 import {
-  IInventarioPlato,
   IInventarioPlatoPayload,
+  IListarInventarioResponse,
 } from "../interface/inventario.interface";
 
 export async function listarInventarioPlatos() {
   return axiosInstance
     .get<IListarInventarioResponse>("/inventario-platos")
     .then(({ data }) => {
-      return data;
+      return data.inventario ?? [];
     });
 }
 

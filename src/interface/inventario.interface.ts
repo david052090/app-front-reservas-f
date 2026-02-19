@@ -1,3 +1,4 @@
+import { EstadoMesa, IMesaPlato } from "./mesas.interface";
 export interface IInventarioPlato {
   id: number;
   nombre: string;
@@ -22,6 +23,7 @@ export interface ICrearMesaPayload {
 }
 
 export interface IListarInventarioResponse {
+  inventario?: IInventarioPlato[];
   inventario_platos?: IInventarioPlato[];
   platos?: IInventarioPlato[];
   data?: IInventarioPlato[];

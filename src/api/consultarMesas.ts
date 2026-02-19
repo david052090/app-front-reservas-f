@@ -1,14 +1,10 @@
 import { axiosInstance } from "./axiosInstance";
-import {
+import type {
+  ICrearMesaPayload,
   IPatchMesaBatchPayload,
   IListarMesasResponse,
-} from "../interface/mesas.interface";
-import { ICrearMesaPayload } from "../interface/inventario.interface";
-import { IListarMesasResponse } from "../interface/mesas.interface";
-import {
   EstadoMesa,
   IAgregarPlatoMesaPayload,
-  IMesaPlato,
 } from "../interface/mesas.interface";
 
 export async function listarMesas() {

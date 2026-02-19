@@ -40,6 +40,14 @@ export interface IListarMesasResponse {
   mesas: IMesa[];
 }
 
+export interface ICrearMesaPayload {
+  numero: number;
+  ubicacion: string;
+  estado: EstadoMesa;
+  reserva_id: number | null;
+  platos: Array<Pick<IMesaPlato, "nombre" | "cantidad" | "precio_unitario">>;
+}
+
 export interface IPlatoEnEdicion {
   id?: number;
   inventarioId?: number;

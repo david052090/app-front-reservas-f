@@ -135,7 +135,7 @@ const GestionMesas = () => {
   const cargarInventarioPlatos = async () => {
     try {
       const data = await listarInventarioPlatos();
-      setInventarioPlatos(data.inventario);
+      setInventarioPlatos(data);
     } catch (error) {
       console.error(error);
       enqueueSnackbar("No se pudo obtener el listado de platos", {

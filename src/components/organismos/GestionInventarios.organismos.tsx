@@ -72,7 +72,7 @@ const GestionInventarios = () => {
     try {
       setCargando(true);
       const data = await listarInventarioPlatos();
-      setItemsInventario(data.inventario);
+      setItemsInventario(data);
     } catch (error) {
       console.error(error);
       enqueueSnackbar("No se pudo obtener el inventario", {
@@ -344,7 +344,9 @@ const GestionInventarios = () => {
                   decimalSeparator=","
                   decimalScale={2}
                   allowNegative={false}
-                  onValueChange={(values) => field.onChange(values.value || "")}
+                  onValueChange={(values: { value?: string }) =>
+                    field.onChange(values.value || "")
+                  }
                 />
               )}
             />
