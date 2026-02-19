@@ -9,6 +9,7 @@ import ConfigAmbientes from "./page/ConfigAmbientes";
 import ConfigTipoReservas from "./page/ConfigTipoReservas";
 import Estadisticas from "./page/Estadisticas";
 import MesasPage from "./page/Mesas";
+import InventariosPage from "./page/Inventarios";
 
 import { ProtegerRutas } from "./components/atomos/ProtegerRutas.atomos";
 import { LoggedOutOnlyRoute } from "./components/atomos/LoggedOutOnlyRoute";
@@ -89,6 +90,16 @@ const App: React.FC = () => {
             <ProtegerRutas>
               <PersistentDrawer>
                 <MesasPage />
+              </PersistentDrawer>
+            </ProtegerRutas>
+          }
+        />
+        <Route
+          path="/inventarios"
+          element={
+            <ProtegerRutas>
+              <PersistentDrawer>
+                <InventariosPage />
               </PersistentDrawer>
             </ProtegerRutas>
           }

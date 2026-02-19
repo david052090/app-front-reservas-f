@@ -17,34 +17,27 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
+import { Controller, useForm } from "react-hook-form";
 import {
-  actualizarEstadoMesa,
-  agregarPlatoMesa,
-  asignarReservaMesa,
   crearMesas,
-  eliminarPlatoMesa,
   listarMesas,
+  patchMesaBatch,
 } from "../../api/consultarMesas";
+import {
+  actualizarInventarioPlato,
+  listarInventarioPlatos,
+} from "../../api/inventarioPlatos";
 import { gestionarListadoReservas } from "../../api/consultarReservas";
+import { IInventarioPlato } from "../../interface/inventario.interface";
 import { IDataReservas } from "../../interface/reservas.interface";
-import { EstadoMesa, IMesa } from "../../interface/mesas.interface";
+import {
+  EstadoMesa,
+  IMesa,
+  IPlatoEnEdicion,
+  IFormGestionMesa,
+} from "../../interface/mesas.interface";
 import { getListaAmbientes } from "../../utils/obtenerAmbientes";
 import Modal from "../moleculas/Modal.moleculas";
-
-interface IPlatoBorrador {
-  nombre: string;
-  cantidad: number;
-  precio_unitario: number;
-}
-
-interface IPlatoEnEdicion {
-  id?: number;
-  nombre: string;
-  cantidad: number;
-  precio_unitario: number;
-  subtotal: number;
-  tempId: string;
-}
 
 const GestionMesas = () => {
   const { enqueueSnackbar } = useSnackbar();
@@ -56,13 +49,8 @@ const GestionMesas = () => {
 
   const [abrirModal, setAbrirModal] = useState(false);
   const [mesaSeleccionada, setMesaSeleccionada] = useState<IMesa | null>(null);
-  const [reservaId, setReservaId] = useState<string>("");
-  const [estadoMesa, setEstadoMesa] = useState<EstadoMesa>("habilitada");
-
-  const [nombrePlato, setNombrePlato] = useState("");
-  const [cantidadPlato, setCantidadPlato] = useState<number>(1);
-  const [precioPlato, setPrecioPlato] = useState<number>(0);
-  const [platosEnEdicion, setPlatosEnEdicion] = useState<IPlatoEnEdicion[]>(
+  const [platosEnEdicion, setPlatosEnEdicion] = useState<IPlatoEnEdicion[]>([]);
+  const [inventarioPlatos, setInventarioPlatos] = useState<IInventarioPlato[]>(
     [],
   );
 
@@ -71,11 +59,25 @@ const GestionMesas = () => {
   const [loadingCrearMesa, setLoadingCrearMesa] = useState(false);
 
   const [numeroMesaNueva, setNumeroMesaNueva] = useState<number>(1);
+  const [errorNumeroMesaNueva, setErrorNumeroMesaNueva] = useState("");
   const [ubicacionMesaNueva, setUbicacionMesaNueva] = useState<string>("");
+  const [errorUbicacionMesaNueva, setErrorUbicacionMesaNueva] = useState("");
   const [estadoMesaNueva, setEstadoMesaNueva] =
     useState<EstadoMesa>("habilitada");
   const [reservaIdMesaNueva, setReservaIdMesaNueva] = useState<string>("");
-  const [platosMesaNueva, setPlatosMesaNueva] = useState<IPlatoBorrador[]>([]);
+  const valoresInicialesGestionMesa: IFormGestionMesa = {
+    reservaId: "",
+    estadoMesa: "habilitada",
+    platoId: "",
+    cantidadPlato: 1,
+  };
+  const { control, reset, setValue, getValues, watch } =
+    useForm<IFormGestionMesa>({
+      defaultValues: valoresInicialesGestionMesa,
+    });
+  const [platoIdForm, cantidadPlatoForm] = watch(["platoId", "cantidadPlato"]);
+  const puedeAgregarPlato =
+    Boolean(platoIdForm) && Number(cantidadPlatoForm) > 0;
 
   const cargarMesas = async () => {
     try {
@@ -111,6 +113,7 @@ const GestionMesas = () => {
     cargarMesas();
     cargarReservas();
     cargarAmbientes();
+    cargarInventarioPlatos();
   }, []);
 
   const cargarAmbientes = async () => {
@@ -129,14 +132,29 @@ const GestionMesas = () => {
     }
   };
 
+  const cargarInventarioPlatos = async () => {
+    try {
+      const data = await listarInventarioPlatos();
+      setInventarioPlatos(data.inventario);
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar("No se pudo obtener el listado de platos", {
+        variant: "warning",
+      });
+    }
+  };
+
   const totalPlatosMesa = useMemo(() => {
     return platosEnEdicion.reduce((acc, plato) => acc + plato.cantidad, 0);
   }, [platosEnEdicion]);
 
   const abrirGestionMesa = (mesa: IMesa) => {
     setMesaSeleccionada(mesa);
-    setReservaId(mesa.reserva?.id ? String(mesa.reserva.id) : "");
-    setEstadoMesa(mesa.estado);
+    reset({
+      ...valoresInicialesGestionMesa,
+      reservaId: mesa.reserva?.id ? String(mesa.reserva.id) : "",
+      estadoMesa: mesa.estado,
+    });
     setPlatosEnEdicion(
       mesa.platos.map((plato) => ({
         ...plato,
@@ -149,16 +167,13 @@ const GestionMesas = () => {
   const cerrarModal = () => {
     setAbrirModal(false);
     setMesaSeleccionada(null);
-    setReservaId("");
-    setEstadoMesa("habilitada");
-    setNombrePlato("");
-    setCantidadPlato(1);
-    setPrecioPlato(0);
+    reset(valoresInicialesGestionMesa);
     setPlatosEnEdicion([]);
   };
 
   const guardarAsignacion = async () => {
     if (!mesaSeleccionada) return;
+    const { reservaId, estadoMesa } = getValues();
     try {
       setLoadingGuardar(true);
       const idsActuales = new Set(
@@ -167,32 +182,72 @@ const GestionMesas = () => {
           .map((plato) => plato.id as number),
       );
       const idsOriginales = mesaSeleccionada.platos.map((plato) => plato.id);
-      const platosAEliminar = idsOriginales.filter((id) => !idsActuales.has(id));
+      const platosAEliminar = idsOriginales.filter(
+        (id) => !idsActuales.has(id),
+      );
       const platosANuevo = platosEnEdicion
         .filter((plato) => plato.id === undefined)
         .map((plato) => ({
+          inventarioId: plato.inventarioId,
           nombre: plato.nombre,
           cantidad: plato.cantidad,
           precio_unitario: plato.precio_unitario,
         }));
 
-      const operacionesPlatos = [
-        ...platosAEliminar.map((idPlatoMesa) =>
-          eliminarPlatoMesa(mesaSeleccionada.id, idPlatoMesa),
-        ),
-        ...platosANuevo.map((plato) =>
-          agregarPlatoMesa(mesaSeleccionada.id, plato),
-        ),
-      ];
+      const descuentosInventario = new Map<number, number>();
+      for (const plato of platosANuevo) {
+        if (!plato.inventarioId) continue;
+        const cantidadActual =
+          descuentosInventario.get(plato.inventarioId) ?? 0;
+        descuentosInventario.set(
+          plato.inventarioId,
+          cantidadActual + plato.cantidad,
+        );
+      }
 
-      await Promise.all([
-        asignarReservaMesa(
-          mesaSeleccionada.id,
-          reservaId ? Number(reservaId) : null,
-        ),
-        actualizarEstadoMesa(mesaSeleccionada.id, estadoMesa),
-        ...operacionesPlatos,
-      ]);
+      for (const [inventarioId, cantidadDescontar] of descuentosInventario) {
+        const platoInventario = inventarioPlatos.find(
+          (item) => item.id === inventarioId,
+        );
+        if (!platoInventario) {
+          enqueueSnackbar("No se encontró un plato en inventario", {
+            variant: "warning",
+          });
+          return;
+        }
+        if (Number(platoInventario.cantidad_disponible) < cantidadDescontar) {
+          enqueueSnackbar(
+            `Inventario insuficiente para ${platoInventario.nombre}`,
+            {
+              variant: "warning",
+            },
+          );
+          return;
+        }
+      }
+
+      await patchMesaBatch(mesaSeleccionada.id, {
+        reserva_id: reservaId ? Number(reservaId) : null,
+        estado: estadoMesa,
+        platos_agregar: platosANuevo.map((plato) => ({
+          nombre: plato.nombre,
+          cantidad: plato.cantidad,
+          precio_unitario: plato.precio_unitario,
+        })),
+        platos_eliminar: platosAEliminar,
+      });
+
+      for (const [inventarioId, cantidadDescontar] of descuentosInventario) {
+        const platoInventario = inventarioPlatos.find(
+          (item) => item.id === inventarioId,
+        );
+        if (!platoInventario) continue;
+        await actualizarInventarioPlato(inventarioId, {
+          cantidad_disponible:
+            Number(platoInventario.cantidad_disponible) - cantidadDescontar,
+        });
+      }
+      await cargarInventarioPlatos();
       enqueueSnackbar("Mesa actualizada correctamente", { variant: "success" });
       const dataMesas = await cargarMesas();
       const mesaActualizada = dataMesas.find(
@@ -213,36 +268,49 @@ const GestionMesas = () => {
   };
 
   const guardarPlato = () => {
-    if (!nombrePlato.trim()) {
-      enqueueSnackbar("Debes ingresar el nombre del plato", {
+    const { platoId, cantidadPlato } = getValues();
+    if (!platoId) {
+      enqueueSnackbar("Debes seleccionar un plato", {
         variant: "warning",
       });
       return;
     }
-    if (cantidadPlato <= 0 || precioPlato < 0) {
-      enqueueSnackbar("Cantidad y precio deben ser válidos", {
+    if (cantidadPlato <= 0) {
+      enqueueSnackbar("La cantidad debe ser válida", {
         variant: "warning",
       });
       return;
     }
+    const platoSeleccionado = inventarioPlatos.find(
+      (plato) => String(plato.id) === platoId,
+    );
+    if (!platoSeleccionado) {
+      enqueueSnackbar("El plato seleccionado no existe en inventario", {
+        variant: "warning",
+      });
+      return;
+    }
+    const precioUnitario = Number(platoSeleccionado.valor_unitario ?? 0);
 
     setPlatosEnEdicion((prev) => [
       ...prev,
       {
         tempId: `nuevo-${Date.now()}-${prev.length}`,
-        nombre: nombrePlato.trim(),
+        inventarioId: platoSeleccionado.id,
+        nombre: platoSeleccionado.nombre.trim(),
         cantidad: Number(cantidadPlato),
-        precio_unitario: Number(precioPlato),
-        subtotal: Number(cantidadPlato) * Number(precioPlato),
+        precio_unitario: precioUnitario,
+        subtotal: Number(cantidadPlato) * precioUnitario,
       },
     ]);
-    setNombrePlato("");
-    setCantidadPlato(1);
-    setPrecioPlato(0);
+    setValue("platoId", "");
+    setValue("cantidadPlato", 1);
   };
 
   const borrarPlato = (tempId: string) => {
-    setPlatosEnEdicion((prev) => prev.filter((plato) => plato.tempId !== tempId));
+    setPlatosEnEdicion((prev) =>
+      prev.filter((plato) => plato.tempId !== tempId),
+    );
   };
 
   const mesasOrdenadas = useMemo(() => {
@@ -251,72 +319,45 @@ const GestionMesas = () => {
 
   const abrirCrearMesa = () => {
     setNumeroMesaNueva(1);
+    setErrorNumeroMesaNueva("");
     setUbicacionMesaNueva("");
+    setErrorUbicacionMesaNueva("");
     setEstadoMesaNueva("habilitada");
     setReservaIdMesaNueva("");
-    setPlatosMesaNueva([]);
     setAbrirModalCrear(true);
   };
 
   const cerrarModalCrear = () => {
+    setErrorNumeroMesaNueva("");
+    setErrorUbicacionMesaNueva("");
     setAbrirModalCrear(false);
   };
 
-  const agregarFilaPlatoNuevaMesa = () => {
-    setPlatosMesaNueva((prev) => [
-      ...prev,
-      { nombre: "", cantidad: 1, precio_unitario: 0 },
-    ]);
+  const validarNumeroMesaNueva = (numero: number) => {
+    if (!Number.isFinite(numero) || numero <= 0) {
+      setErrorNumeroMesaNueva(
+        "El número de mesa es obligatorio y debe ser mayor a 0",
+      );
+      return false;
+    }
+    setErrorNumeroMesaNueva("");
+    return true;
   };
 
-  const eliminarFilaPlatoNuevaMesa = (index: number) => {
-    setPlatosMesaNueva((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const actualizarFilaPlatoNuevaMesa = (
-    index: number,
-    campo: keyof IPlatoBorrador,
-    valor: string | number,
-  ) => {
-    setPlatosMesaNueva((prev) =>
-      prev.map((item, i) => {
-        if (i !== index) return item;
-        return {
-          ...item,
-          [campo]: campo === "nombre" ? String(valor) : Number(valor),
-        };
-      }),
-    );
+  const validarUbicacionMesaNueva = (ubicacion: string) => {
+    if (!ubicacion.trim()) {
+      setErrorUbicacionMesaNueva("La ubicación es obligatoria");
+      return false;
+    }
+    setErrorUbicacionMesaNueva("");
+    return true;
   };
 
   const crearMesa = async () => {
     const numero = Number(numeroMesaNueva);
-    if (!Number.isFinite(numero) || numero <= 0) {
-      enqueueSnackbar("El número de mesa debe ser mayor a 0", {
-        variant: "warning",
-      });
-      return;
-    }
-    if (!ubicacionMesaNueva.trim()) {
-      enqueueSnackbar("La ubicación es obligatoria", { variant: "warning" });
-      return;
-    }
-
-    const platosValidados = platosMesaNueva
-      .filter((plato) => plato.nombre.trim())
-      .map((plato) => ({
-        nombre: plato.nombre.trim(),
-        cantidad: Number(plato.cantidad),
-        precio_unitario: Number(plato.precio_unitario),
-      }));
-
-    const hayPlatoInvalido = platosValidados.some(
-      (plato) => plato.cantidad <= 0 || plato.precio_unitario < 0,
-    );
-    if (hayPlatoInvalido) {
-      enqueueSnackbar("Revisa cantidad y precio de los platos", {
-        variant: "warning",
-      });
+    const esNumeroValido = validarNumeroMesaNueva(numero);
+    const esUbicacionValida = validarUbicacionMesaNueva(ubicacionMesaNueva);
+    if (!esNumeroValido || !esUbicacionValida) {
       return;
     }
 
@@ -328,7 +369,7 @@ const GestionMesas = () => {
           ubicacion: ubicacionMesaNueva.trim(),
           estado: estadoMesaNueva,
           reserva_id: reservaIdMesaNueva ? Number(reservaIdMesaNueva) : null,
-          platos: platosValidados,
+          platos: [],
         },
       ]);
       enqueueSnackbar("Mesa creada correctamente", { variant: "success" });
@@ -371,7 +412,10 @@ const GestionMesas = () => {
         <Grid container spacing={2}>
           {cargando
             ? Array.from({ length: 6 }).map((_, index) => (
-                <Grid key={`skeleton-mesa-${index}`} size={{ xs: 12, md: 6, lg: 4 }}>
+                <Grid
+                  key={`skeleton-mesa-${index}`}
+                  size={{ xs: 12, md: 6, lg: 4 }}
+                >
                   <Card>
                     <CardContent>
                       <Stack
@@ -385,7 +429,12 @@ const GestionMesas = () => {
                       <Skeleton variant="text" width="80%" />
                       <Skeleton variant="text" width="35%" />
                       <Skeleton variant="text" width="45%" />
-                      <Skeleton variant="rounded" width={110} height={36} sx={{ mt: 2 }} />
+                      <Skeleton
+                        variant="rounded"
+                        width={110}
+                        height={36}
+                        sx={{ mt: 2 }}
+                      />
                     </CardContent>
                   </Card>
                 </Grid>
@@ -407,7 +456,9 @@ const GestionMesas = () => {
                           label={
                             mesa.estado === "ocupada" ? "Ocupada" : "Habilitada"
                           }
-                          color={mesa.estado === "ocupada" ? "error" : "success"}
+                          color={
+                            mesa.estado === "ocupada" ? "error" : "success"
+                          }
                         />
                       </Stack>
                       <Typography variant="body2" color="text.secondary">
@@ -417,7 +468,10 @@ const GestionMesas = () => {
                         Platos: {mesa.platos?.length ?? 0}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Total: ${Number(mesa.total ?? 0).toFixed(2)}
+                        Total: $
+                        {Number(mesa.total ?? 0).toLocaleString("es-CO", {
+                          maximumFractionDigits: 0,
+                        })}
                       </Typography>
                       <Button
                         variant="contained"
@@ -451,9 +505,16 @@ const GestionMesas = () => {
               type="number"
               size="small"
               value={numeroMesaNueva}
-              onChange={(event) =>
-                setNumeroMesaNueva(Number(event.target.value))
-              }
+              onChange={(event) => {
+                const nuevoNumero = Number(event.target.value);
+                setNumeroMesaNueva(nuevoNumero);
+                if (errorNumeroMesaNueva) {
+                  validarNumeroMesaNueva(nuevoNumero);
+                }
+              }}
+              onBlur={() => validarNumeroMesaNueva(Number(numeroMesaNueva))}
+              error={Boolean(errorNumeroMesaNueva)}
+              helperText={errorNumeroMesaNueva}
               fullWidth
             />
             <TextField
@@ -461,7 +522,16 @@ const GestionMesas = () => {
               label="Ubicación"
               size="small"
               value={ubicacionMesaNueva}
-              onChange={(event) => setUbicacionMesaNueva(event.target.value)}
+              onChange={(event) => {
+                const nuevaUbicacion = event.target.value;
+                setUbicacionMesaNueva(nuevaUbicacion);
+                if (errorUbicacionMesaNueva) {
+                  validarUbicacionMesaNueva(nuevaUbicacion);
+                }
+              }}
+              onBlur={() => validarUbicacionMesaNueva(ubicacionMesaNueva)}
+              error={Boolean(errorUbicacionMesaNueva)}
+              helperText={errorUbicacionMesaNueva}
               fullWidth
             >
               <MenuItem value="">Selecciona una ubicación</MenuItem>
@@ -503,80 +573,6 @@ const GestionMesas = () => {
               ))}
             </TextField>
           </Stack>
-
-          <Divider />
-
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography sx={{ fontWeight: 600 }}>
-              Platos iniciales (opcional)
-            </Typography>
-            <Button size="small" onClick={agregarFilaPlatoNuevaMesa}>
-              Agregar plato
-            </Button>
-          </Stack>
-
-          <Stack spacing={1}>
-            {platosMesaNueva.map((plato, index) => (
-              <Stack
-                key={index}
-                direction={{ xs: "column", md: "row" }}
-                spacing={1}
-              >
-                <TextField
-                  label="Nombre"
-                  size="small"
-                  value={plato.nombre}
-                  onChange={(event) =>
-                    actualizarFilaPlatoNuevaMesa(
-                      index,
-                      "nombre",
-                      event.target.value,
-                    )
-                  }
-                  fullWidth
-                />
-                <TextField
-                  label="Cantidad"
-                  size="small"
-                  type="number"
-                  value={plato.cantidad}
-                  onChange={(event) =>
-                    actualizarFilaPlatoNuevaMesa(
-                      index,
-                      "cantidad",
-                      Number(event.target.value),
-                    )
-                  }
-                  sx={{ width: { xs: "100%", md: 130 } }}
-                />
-                <TextField
-                  label="Precio unitario"
-                  size="small"
-                  type="number"
-                  value={plato.precio_unitario}
-                  onChange={(event) =>
-                    actualizarFilaPlatoNuevaMesa(
-                      index,
-                      "precio_unitario",
-                      Number(event.target.value),
-                    )
-                  }
-                  sx={{ width: { xs: "100%", md: 150 } }}
-                />
-                <Button
-                  color="error"
-                  onClick={() => eliminarFilaPlatoNuevaMesa(index)}
-                  sx={{ minWidth: 100 }}
-                >
-                  Quitar
-                </Button>
-              </Stack>
-            ))}
-          </Stack>
         </Stack>
       </Modal>
 
@@ -592,35 +588,43 @@ const GestionMesas = () => {
         width={680}
       >
         <Stack spacing={2} sx={{ pt: 1 }}>
-          <TextField
-            select
-            label="Reserva asociada (opcional)"
-            value={reservaId}
-            onChange={(event) => setReservaId(event.target.value)}
-            size="small"
-            fullWidth
-          >
-            <MenuItem value="">Sin reserva</MenuItem>
-            {reservas.map((reserva) => (
-              <MenuItem key={reserva.id} value={String(reserva.id)}>
-                {reserva.nombre_cliente} - Mesa {reserva.numero_mesa}
-              </MenuItem>
-            ))}
-          </TextField>
+          <Controller
+            name="reservaId"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                select
+                label="Reserva asociada (opcional)"
+                size="small"
+                fullWidth
+                {...field}
+              >
+                <MenuItem value="">Sin reserva</MenuItem>
+                {reservas.map((reserva) => (
+                  <MenuItem key={reserva.id} value={String(reserva.id)}>
+                    {reserva.nombre_cliente} - Mesa {reserva.numero_mesa}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
 
-          <TextField
-            select
-            label="Estado de la mesa"
-            value={estadoMesa}
-            onChange={(event) =>
-              setEstadoMesa(event.target.value as EstadoMesa)
-            }
-            size="small"
-            fullWidth
-          >
-            <MenuItem value="habilitada">Habilitada</MenuItem>
-            <MenuItem value="ocupada">Ocupada</MenuItem>
-          </TextField>
+          <Controller
+            name="estadoMesa"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                select
+                label="Estado de la mesa"
+                size="small"
+                fullWidth
+                {...field}
+              >
+                <MenuItem value="habilitada">Habilitada</MenuItem>
+                <MenuItem value="ocupada">Ocupada</MenuItem>
+              </TextField>
+            )}
+          />
 
           <Divider />
 
@@ -628,34 +632,55 @@ const GestionMesas = () => {
             Registrar plato para la mesa (con o sin reserva)
           </Typography>
           <Stack direction={{ xs: "column", md: "row" }} spacing={1}>
-            <TextField
-              label="Plato"
-              size="small"
-              fullWidth
-              value={nombrePlato}
-              onChange={(event) => setNombrePlato(event.target.value)}
+            <Controller
+              name="platoId"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  select
+                  label="Plato"
+                  size="small"
+                  fullWidth
+                  {...field}
+                >
+                  <MenuItem value="">Selecciona un plato</MenuItem>
+                  {inventarioPlatos.map((plato) => (
+                    <MenuItem key={plato.id} value={String(plato.id)}>
+                      {plato.nombre} - $
+                      {Number(plato.valor_unitario ?? 0).toLocaleString(
+                        "es-CO",
+                        {
+                          maximumFractionDigits: 0,
+                        },
+                      )}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
             />
-            <TextField
-              label="Cantidad"
-              size="small"
-              type="number"
-              value={cantidadPlato}
-              onChange={(event) => setCantidadPlato(Number(event.target.value))}
-              sx={{ width: { xs: "100%", md: 120 } }}
-            />
-            <TextField
-              label="Precio"
-              size="small"
-              type="number"
-              value={precioPlato}
-              onChange={(event) => setPrecioPlato(Number(event.target.value))}
-              sx={{ width: { xs: "100%", md: 140 } }}
+            <Controller
+              name="cantidadPlato"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  label="Cantidad"
+                  size="small"
+                  type="number"
+                  sx={{ width: { xs: "100%", md: 120 } }}
+                  value={field.value}
+                  onChange={(event) =>
+                    field.onChange(Number(event.target.value))
+                  }
+                />
+              )}
             />
             <Button
               variant="contained"
               onClick={guardarPlato}
-              disabled={loadingGuardar}
-              sx={{ minWidth: 130 }}
+              disabled={
+                loadingGuardar || !puedeAgregarPlato || !inventarioPlatos.length
+              }
+              sx={{ minWidth: 100 }}
             >
               Agregar
             </Button>
@@ -682,9 +707,14 @@ const GestionMesas = () => {
                 >
                   <Typography variant="body2">
                     {plato.nombre} x{plato.cantidad} - $
-                    {plato.subtotal.toFixed(2)}
+                    {Number(plato.subtotal ?? 0).toLocaleString("es-CO", {
+                      maximumFractionDigits: 0,
+                    })}
                   </Typography>
-                  <IconButton size="small" onClick={() => borrarPlato(plato.tempId)}>
+                  <IconButton
+                    size="small"
+                    onClick={() => borrarPlato(plato.tempId)}
+                  >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Stack>

@@ -145,6 +145,37 @@ export const ENCABEZADO_TABLA_GESTIONAR_USUARIOS: Array<ITablaEncabezado> = [
   },
 ];
 
+export const ENCABEZADO_TABLA_INVENTARIOS: Array<ITablaEncabezado> = [
+  {
+    id: "nombre",
+    label: "Nombre",
+    align: "left",
+    width: "20%",
+    iconoOrdenar: false,
+  },
+  {
+    id: "cantidad_disponible",
+    label: "Cantidad disponible",
+    align: "right",
+    width: "20%",
+    iconoOrdenar: false,
+  },
+  {
+    id: "valor_unitario",
+    label: "Valor unitario",
+    align: "right",
+    width: "20%",
+    iconoOrdenar: false,
+  },
+  {
+    id: "acciones",
+    label: "Acciones",
+    align: "center",
+    width: "20%",
+    iconoOrdenar: false,
+  },
+];
+
 export const ROLES_USUARIOS = {
   propietario: 1,
   admin: 2,
