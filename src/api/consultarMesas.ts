@@ -52,6 +52,22 @@ export async function patchMesaBatch(
     .then(({ data }) => data);
 }
 
+export interface IFacturarMesaResponse {
+  ok: boolean;
+  total_facturado_mesa?: number;
+  ventas_hoy?: {
+    fecha: string;
+    total_ventas: number;
+    cantidad_facturas: number;
+  };
+}
+
+export async function facturarMesa(idMesa: number) {
+  return axiosInstance
+    .post<IFacturarMesaResponse>(`/mesas/${idMesa}/facturar`, {})
+    .then(({ data }) => data);
+}
+
 export async function crearMesas(mesas: ICrearMesaPayload[]) {
   return axiosInstance.post("/mesas", { mesas }).then(({ data }) => data);
 }

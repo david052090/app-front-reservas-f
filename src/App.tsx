@@ -10,6 +10,7 @@ import ConfigTipoReservas from "./page/ConfigTipoReservas";
 import Estadisticas from "./page/Estadisticas";
 import MesasPage from "./page/Mesas";
 import InventariosPage from "./page/Inventarios";
+import VentasPage from "./page/Ventas";
 
 import { ProtegerRutas } from "./components/atomos/ProtegerRutas.atomos";
 import { LoggedOutOnlyRoute } from "./components/atomos/LoggedOutOnlyRoute";
@@ -100,6 +101,16 @@ const App: React.FC = () => {
             <ProtegerRutas>
               <PersistentDrawer>
                 <InventariosPage />
+              </PersistentDrawer>
+            </ProtegerRutas>
+          }
+        />
+        <Route
+          path="/ventas"
+          element={
+            <ProtegerRutas>
+              <PersistentDrawer>
+                <VentasPage />
               </PersistentDrawer>
             </ProtegerRutas>
           }

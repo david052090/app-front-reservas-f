@@ -20,6 +20,7 @@ import dayjs from "dayjs";
 import { Controller, useForm } from "react-hook-form";
 import {
   crearMesas,
+  facturarMesa,
   listarMesas,
   patchMesaBatch,
 } from "../../api/consultarMesas";
@@ -55,6 +56,7 @@ const GestionMesas = () => {
   );
 
   const [loadingGuardar, setLoadingGuardar] = useState(false);
+  const [facturandoMesaId, setFacturandoMesaId] = useState<number | null>(null);
   const [abrirModalCrear, setAbrirModalCrear] = useState(false);
   const [loadingCrearMesa, setLoadingCrearMesa] = useState(false);
 
@@ -383,6 +385,29 @@ const GestionMesas = () => {
     }
   };
 
+  const facturarMesaTarjeta = async (mesa: IMesa) => {
+    try {
+      setFacturandoMesaId(mesa.id);
+      const respuesta = await facturarMesa(mesa.id);
+      enqueueSnackbar(
+        `Mesa facturada. Total: $${Number(
+          respuesta.total_facturado_mesa ?? 0,
+        ).toLocaleString("es-CO", { maximumFractionDigits: 0 })}`,
+        {
+          variant: "success",
+        },
+      );
+      await cargarMesas();
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar("No se pudo facturar la mesa", {
+        variant: "error",
+      });
+    } finally {
+      setFacturandoMesaId(null);
+    }
+  };
+
   return (
     <>
       <Box sx={{ width: { xs: "auto", md: "1040px" }, maxWidth: "100%" }}>
@@ -473,13 +498,33 @@ const GestionMesas = () => {
                           maximumFractionDigits: 0,
                         })}
                       </Typography>
-                      <Button
-                        variant="contained"
-                        sx={{ mt: 2 }}
-                        onClick={() => abrirGestionMesa(mesa)}
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        justifyContent="space-between"
+                        alignItems="center"
+                        sx={{ mt: 2, width: "100%" }}
                       >
-                        Gestionar
-                      </Button>
+                        <Button
+                          variant="contained"
+                          onClick={() => abrirGestionMesa(mesa)}
+                        >
+                          Gestionar
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="success"
+                          disabled={
+                            facturandoMesaId === mesa.id ||
+                            Number(mesa.total ?? 0) <= 0
+                          }
+                          onClick={() => facturarMesaTarjeta(mesa)}
+                        >
+                          {facturandoMesaId === mesa.id
+                            ? "Cerrando..."
+                            : "Cerrar mesa"}
+                        </Button>
+                      </Stack>
                     </CardContent>
                   </Card>
                 </Grid>
@@ -579,7 +624,9 @@ const GestionMesas = () => {
       <Modal
         open={abrirModal}
         onCancelar={cerrarModal}
-        titulo={`Mesa #${mesaSeleccionada?.numero ?? ""}`}
+        titulo={`Mesa #${mesaSeleccionada?.numero ?? ""} - Total a pagar: $${Number(
+          mesaSeleccionada?.total ?? 0,
+        ).toLocaleString("es-CO", { maximumFractionDigits: 0 })}`}
         onGuardar={guardarAsignacion}
         loadingBtnGuardar={loadingGuardar}
         mostrarBtnGuardar

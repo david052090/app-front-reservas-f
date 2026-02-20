@@ -196,7 +196,7 @@ const GestionInventarios = () => {
     <>
       <Box
         sx={{
-          width: { xs: "auto", md: "920px" },
+          width: { xs: "auto", md: "800px" },
           maxWidth: { xs: "100vw", md: "none" },
         }}
       >

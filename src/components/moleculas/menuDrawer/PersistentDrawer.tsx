@@ -25,6 +25,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import TableRestaurantIcon from "@mui/icons-material/TableRestaurant";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
+import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { logoutUsuario } from "../../../api/autenticacionUsuarios.ts"; // ← ZUSTAND
@@ -258,6 +259,18 @@ export default function PersistentDrawer({
                 <Inventory2Icon />
               </ListItemIcon>
               <ListItemText primary="Inventarios" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem disablePadding>
+            <ListItemButton
+              component={RouterLink}
+              to="/ventas"
+              selected={location.pathname === "/ventas"}
+            >
+              <ListItemIcon>
+                <PointOfSaleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Ventas" />
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>

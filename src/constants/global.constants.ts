@@ -176,6 +176,30 @@ export const ENCABEZADO_TABLA_INVENTARIOS: Array<ITablaEncabezado> = [
   },
 ];
 
+export const ENCABEZADO_TABLA_VENTAS: Array<ITablaEncabezado> = [
+  {
+    id: "numero_mesa",
+    label: "Mesa",
+    align: "left",
+    width: "15%",
+    iconoOrdenar: false,
+  },
+  {
+    id: "fecha_venta",
+    label: "Fecha venta",
+    align: "right",
+    width: "35%",
+    iconoOrdenar: false,
+  },
+  {
+    id: "total_venta",
+    label: "Total venta",
+    align: "right",
+    width: "35%",
+    iconoOrdenar: false,
+  },
+];
+
 export const ROLES_USUARIOS = {
   propietario: 1,
   admin: 2,
